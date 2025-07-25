@@ -1,9 +1,7 @@
 "use client";
 
 import { Song } from "@/generated/prisma";
-import { useState } from "react";
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   search: (query: string) => Promise<Song[]>;
@@ -27,20 +25,70 @@ const SongsScreen = ({ search }: Props) => {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      <div className="flex flex-col gap-2">
-        <ul>
+      <div className="flex">
+        <div className="flex-1 p-4">
           {songs.map((song) => (
-            <li key={song.id} onClick={() => setSelectedSong(song)}>
-              {song.name}
-            </li>
+            <div
+              key={song.id}
+              className={`flex items-center gap-4 py-2 px-4 rounded cursor-pointer hover:bg-gray-800 ${
+                song.id === selectedSong?.id ? "bg-blue-600" : ""
+              }`}
+              onClick={() => setSelectedSong(song)}
+            >
+              <div className="flex-1">
+                <div className="text-cyan-400">{song.name}</div>
+                <div className="text-gray-400 text-sm">{song.artist}</div>
+              </div>
+
+              {song.difficultyGuitar && (
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-gray-600 rounded-full"></div>
+                  <span className="text-sm">{song.difficultyGuitar}</span>
+                </div>
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
 
         {selectedSong && (
-          <div>
-            <h2>{selectedSong.name}</h2>
-            <p>{selectedSong.artist}</p>
-            <pre>{JSON.stringify(selectedSong, null, 2)}</pre>
+          <div className="w-80 bg-gray-800 p-4">
+            <div className="bg-gray-900 border-gray-700">
+              <div className="p-4">
+                <div className="relative mb-4">
+                  <div className="absolute bottom-2 left-2 bg-black bg-opacity-75 px-2 py-1 rounded">
+                    <div className="text-white font-bold">
+                      {selectedSong.album}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">CHARTER</span>
+                    <span>{selectedSong.charter}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">GENRE</span>
+                    <span>{selectedSong.genre}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">YEAR</span>
+                    <span>{selectedSong.year}</span>
+                    <span className="text-gray-400">LENGTH</span>
+                    <span>{selectedSong.length}</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-center gap-2 mt-4">
+                  {[...Array(10)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-8 h-8 bg-gray-600 rounded-full"
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
