@@ -88,7 +88,7 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
                 ) : null}
 
                 <div
-                  className={`flex items-center gap-4 py-2 px-4 rounded cursor-pointer border-1 border-layout-dark hover:bg-layout-dark ${
+                  className={`flex items-center gap-4 py-2 px-4 rounded cursor-pointer border-y-1 border-layout-dark hover:bg-layout-dark ${
                     song.id === selectedSong?.id ? "bg-layout-dark" : ""
                   }`}
                   onClick={() => setSelectedSong(song)}
