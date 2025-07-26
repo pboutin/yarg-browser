@@ -51,16 +51,20 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
 
   return (
     <div>
-      <div className="flex sticky top-0 bg-black">
+      <div className="py-6 px-4 w-full gap-6 flex sticky top-0 bg-black border-b-8 border-layout-light items-center z-10">
+        <div className="text-white uppercase font-extrabold text-5xl">
+          library
+        </div>
+
         <input
           type="text"
           value={query}
-          className="flex-1 px-4 py-2 m-4 rounded-4xl bg-white text-black"
+          className="flex-1 px-6 py-2 rounded-4xl bg-white text-black text-xl font-semibold"
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
 
-      <div className="p-4 w-3/4">
+      <div className={`p-4 ${selectedSong ? "w-3/4" : "w-full"}`}>
         <InfiniteScroll
           dataLength={songs.length}
           next={handleLoadMore}
@@ -84,19 +88,21 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
                 ) : null}
 
                 <div
-                  className={`flex items-center gap-4 py-2 px-4 rounded cursor-pointer hover:bg-gray-800 ${
-                    song.id === selectedSong?.id ? "bg-blue-600" : ""
+                  className={`flex items-center gap-4 py-2 px-4 rounded cursor-pointer border-1 border-layout-dark hover:bg-layout-dark ${
+                    song.id === selectedSong?.id ? "bg-layout-dark" : ""
                   }`}
                   onClick={() => setSelectedSong(song)}
                 >
-                  <CharterIcon charterId={song.charterId} size={24} />
+                  <CharterIcon charterId={song.charterId} size={32} />
 
-                  <div className="flex-1">
-                    <div className="text-cyan-400">{song.name}</div>
-                    <div className="text-gray-400 text-sm">{song.artist}</div>
+                  <div className="text-primary text-xl flex-1">{song.name}</div>
+                  <div className="text-secondary text-md italic flex-1">
+                    {song.artist}
                   </div>
 
                   <Instruments
+                    className="ml-auto"
+                    size={32}
                     guitar={song.difficultyGuitar}
                     bass={song.difficultyBass}
                     drums={song.difficultyDrums}

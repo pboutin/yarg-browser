@@ -1,12 +1,12 @@
 import Image from "next/image";
 
 interface Props {
+  size: number;
   guitar: number | boolean | null;
   bass: number | boolean | null;
   drums: number | boolean | null;
   vocals: number | boolean | null;
   className?: string;
-  size?: number;
 }
 
 export const Instruments = ({
@@ -15,7 +15,7 @@ export const Instruments = ({
   drums,
   vocals,
   className,
-  size = 32,
+  size,
 }: Props) => {
   const bandStatus = !!guitar && !!bass && !!drums && !!vocals;
 
