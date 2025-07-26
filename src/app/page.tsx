@@ -1,12 +1,18 @@
 import * as SongRepository from "@/repositories/songs";
 import SongsScreen from "@/screens/songs";
 
-export default function Home() {
-  async function search(query: string, skip?: number) {
+const Home = () => {
+  const search = async (query: string, skip?: number) => {
     "use server";
-
     return SongRepository.search(query, skip);
-  }
+  };
 
-  return <SongsScreen search={search} />;
-}
+  const countForArtist = async (artist: string, query?: string) => {
+    "use server";
+    return SongRepository.countForArtist(artist, query);
+  };
+
+  return <SongsScreen search={search} countForArtist={countForArtist} />;
+};
+
+export default Home;
