@@ -1,6 +1,7 @@
 "use client";
 
 import CharterIcon from "@/components/charter-icon";
+import { Instruments } from "@/components/instruments";
 import { Song } from "@/generated/prisma";
 import useDebouncedValue from "@/hooks/use-debounced-value";
 import ArtistHeader from "@/screens/songs/artist-header";
@@ -95,12 +96,12 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
                     <div className="text-gray-400 text-sm">{song.artist}</div>
                   </div>
 
-                  {song.difficultyGuitar && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-gray-600 rounded-full"></div>
-                      <span className="text-sm">{song.difficultyGuitar}</span>
-                    </div>
-                  )}
+                  <Instruments
+                    guitar={song.difficultyGuitar}
+                    bass={song.difficultyBass}
+                    drums={song.difficultyDrums}
+                    vocals={song.difficultyVocals}
+                  />
                 </div>
               </div>
             );
