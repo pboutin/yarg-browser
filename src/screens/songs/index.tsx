@@ -4,6 +4,7 @@ import CharterIcon from "@/components/charter-icon";
 import { Song } from "@/generated/prisma";
 import useDebouncedValue from "@/hooks/use-debounced-value";
 import ArtistHeader from "@/screens/songs/artist-header";
+import SongDetails from "@/screens/songs/song-details";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -16,9 +17,10 @@ interface Props {
     hasMore: boolean;
   }>;
   countForArtist: (artist: string, query?: string) => Promise<number>;
+  fetchAlbumImage: (songDirectory: string) => Promise<string>;
 }
 
-const SongsScreen = ({ search, countForArtist }: Props) => {
+const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
   const [query, setQuery] = useState("");
   const [songs, setSongs] = useState<Song[]>([]);
   const [hasMore, setHasMore] = useState(false);
@@ -106,39 +108,9 @@ const SongsScreen = ({ search, countForArtist }: Props) => {
         </InfiniteScroll>
       </div>
 
-      {selectedSong && (
-        <div className="flex-1 fixed right-0 w-1/4 top-16 bg-gray-800 p-4">
-          <div className="bg-gray-900 border-gray-700">
-            <div className="p-4">
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">CHARTER</span>
-                  <span>{selectedSong.charter}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">GENRE</span>
-                  <span>{selectedSong.genre}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">YEAR</span>
-                  <span>{selectedSong.year}</span>
-                  <span className="text-gray-400">LENGTH</span>
-                  <span>{selectedSong.length}</span>
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-2 mt-4">
-                {[...Array(10)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 bg-gray-600 rounded-full"
-                  ></div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {selectedSong ? (
+        <SongDetails song={selectedSong} fetchAlbumImage={fetchAlbumImage} />
+      ) : null}
     </div>
   );
 };

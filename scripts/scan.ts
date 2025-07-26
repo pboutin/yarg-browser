@@ -31,6 +31,7 @@ if (!SONGS_DIRECTORY) {
 
     const song: Omit<Song, "id"> = {
       name: songIniContent.name,
+      directory: songDirectory,
       artist: songIniContent.artist,
       album: songIniContent.album,
       genre: songIniContent.genre,

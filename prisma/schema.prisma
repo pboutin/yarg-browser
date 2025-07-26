@@ -13,6 +13,7 @@ datasource db {
 
 model Song {
   id      String   @id
+  directory String
   name    String
   artist  String
   album   String?

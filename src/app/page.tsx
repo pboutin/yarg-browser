@@ -1,4 +1,5 @@
 import * as SongRepository from "@/repositories/songs";
+import * as AlbumImageRepository from "@/repositories/album-images";
 import SongsScreen from "@/screens/songs";
 
 const Home = () => {
@@ -12,7 +13,18 @@ const Home = () => {
     return SongRepository.countForArtist(artist, query);
   };
 
-  return <SongsScreen search={search} countForArtist={countForArtist} />;
+  const fetchAlbumImage = async (songDirectory: string) => {
+    "use server";
+    return AlbumImageRepository.fetch(songDirectory);
+  };
+
+  return (
+    <SongsScreen
+      search={search}
+      countForArtist={countForArtist}
+      fetchAlbumImage={fetchAlbumImage}
+    />
+  );
 };
 
 export default Home;
