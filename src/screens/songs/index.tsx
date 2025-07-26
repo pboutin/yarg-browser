@@ -1,5 +1,6 @@
 "use client";
 
+import CharterIcon from "@/components/charter-icon";
 import { Song } from "@/generated/prisma";
 import useDebouncedValue from "@/hooks/use-debounced-value";
 import ArtistHeader from "@/screens/songs/artist-header";
@@ -85,6 +86,8 @@ const SongsScreen = ({ search, countForArtist }: Props) => {
                   }`}
                   onClick={() => setSelectedSong(song)}
                 >
+                  <CharterIcon charterId={song.charterId} size={24} />
+
                   <div className="flex-1">
                     <div className="text-cyan-400">{song.name}</div>
                     <div className="text-gray-400 text-sm">{song.artist}</div>

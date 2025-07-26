@@ -19,7 +19,7 @@ model Song {
   genre   String?
   year    Int?
   charter String?
-  charterIcon String?
+  charterId String?
   length Int
   
   difficultyGuitar Int?

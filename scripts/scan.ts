@@ -36,7 +36,7 @@ if (!SONGS_DIRECTORY) {
       genre: songIniContent.genre,
       year: parseInt(songIniContent.year),
       charter: songIniContent.charter,
-      charterIcon: songIniContent.icon,
+      charterId: songIniContent.icon,
       length: parseInt(songIniContent.song_length),
       difficultyGuitar: parseInt(songIniContent.diff_guitar),
       difficultyBass: parseInt(songIniContent.diff_bass),
