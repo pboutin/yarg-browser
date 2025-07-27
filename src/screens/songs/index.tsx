@@ -50,21 +50,21 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
   let latestRenderedArtist: string | null = null;
 
   return (
-    <div>
-      <div className="py-6 px-4 w-full gap-6 flex sticky top-0 bg-black border-b-8 border-layout-light items-center z-10">
-        <div className="text-white uppercase font-extrabold text-5xl">
-          library
+    <>
+      <div className={`${selectedSong ? "w-3/4" : "w-full"}`}>
+        <div className="py-6 px-4 w-full gap-6 flex sticky top-0 bg-black border-b-8 border-layout-light items-center z-10">
+          <div className="text-white uppercase font-extrabold text-5xl">
+            library
+          </div>
+
+          <input
+            type="text"
+            value={query}
+            className="flex-1 px-6 py-2 rounded-4xl bg-white text-black text-xl font-semibold"
+            onChange={(e) => setQuery(e.target.value)}
+          />
         </div>
 
-        <input
-          type="text"
-          value={query}
-          className="flex-1 px-6 py-2 rounded-4xl bg-white text-black text-xl font-semibold"
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
-
-      <div className={`p-4 ${selectedSong ? "w-3/4" : "w-full"}`}>
         <InfiniteScroll
           dataLength={songs.length}
           next={handleLoadMore}
@@ -118,7 +118,7 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
       {selectedSong ? (
         <SongDetails song={selectedSong} fetchAlbumImage={fetchAlbumImage} />
       ) : null}
-    </div>
+    </>
   );
 };
 

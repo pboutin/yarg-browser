@@ -9,7 +9,7 @@ interface Props {
   song: Song;
   fetchAlbumImage: (songDirectory: string) => Promise<string>;
 }
-// <CharterIcon charterId={song.charterId} size={32} />
+
 const SongDetails = ({ song, fetchAlbumImage }: Props) => {
   const [albumImage, setAlbumImage] = useState<string | null>(null);
 
@@ -18,7 +18,7 @@ const SongDetails = ({ song, fetchAlbumImage }: Props) => {
   }, [song.directory, fetchAlbumImage]);
 
   return (
-    <div className="fixed right-0 w-1/4 top-29 pr-4">
+    <div className="fixed right-0 w-1/4 top-0">
       <div className="bg-background flex flex-col gap-4">
         {albumImage ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -29,7 +29,7 @@ const SongDetails = ({ song, fetchAlbumImage }: Props) => {
           />
         ) : null}
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 px-4">
           <div className="text-white text-3xl font-bold">{song.name}</div>
           <div className="text-primary text-xl font-semibold">
             {song.artist}
@@ -39,7 +39,7 @@ const SongDetails = ({ song, fetchAlbumImage }: Props) => {
           </div>
         </div>
 
-        <div className="py-4 px-2 text-md text-white font-bold uppercase flex flex-col gap-2">
+        <div className="px-4 text-md text-white font-bold uppercase flex flex-col gap-2">
           <div className="flex justify-between">
             <div className="text-gray-400 font-semibold text-sm">CHARTER</div>
             <div className="flex items-center gap-2">
@@ -63,8 +63,8 @@ const SongDetails = ({ song, fetchAlbumImage }: Props) => {
       </div>
 
       <Instruments
-        className="mt-4 justify-between"
-        size={64}
+        className="m-4 justify-between"
+        size={48}
         guitar={song.difficultyGuitar}
         bass={song.difficultyBass}
         drums={song.difficultyDrums}
