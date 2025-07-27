@@ -21,7 +21,15 @@ export const search = async (query: string, skip: number = 0) => {
     skip,
   });
 
+  const total =
+    skip === 0
+      ? await prismaClient.song.count({
+          where: searchQuery(query),
+        })
+      : null;
+
   return {
+    total,
     songs: songs.slice(0, PER_PAGE),
     hasMore: songs.length > PER_PAGE,
   };

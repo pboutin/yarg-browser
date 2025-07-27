@@ -2,6 +2,7 @@
 
 import CharterIcon from "@/components/charter-icon";
 import { Instruments } from "@/components/instruments";
+import SongCount from "@/components/song-count";
 import { Song } from "@/generated/prisma";
 import useDebouncedValue from "@/hooks/use-debounced-value";
 import ArtistHeader from "@/screens/songs/artist-header";
@@ -16,6 +17,7 @@ interface Props {
   ) => Promise<{
     songs: Song[];
     hasMore: boolean;
+    total: number | null;
   }>;
   countForArtist: (artist: string, query?: string) => Promise<number>;
   fetchAlbumImage: (songDirectory: string) => Promise<string>;
@@ -24,6 +26,7 @@ interface Props {
 const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
   const [query, setQuery] = useState("");
   const [songs, setSongs] = useState<Song[]>([]);
+  const [total, setTotal] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
 
@@ -33,10 +36,12 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
     window.scrollTo(0, 0);
     setSongs([]);
     setHasMore(false);
+    setTotal(null);
 
-    search(debouncedQuery).then(({ songs, hasMore }) => {
+    search(debouncedQuery).then(({ songs, hasMore, total }) => {
       setSongs(songs);
       setHasMore(hasMore);
+      if (total !== null) setTotal(total);
     });
   }, [debouncedQuery, search]);
 
@@ -52,17 +57,25 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
   return (
     <>
       <div className={`${selectedSong ? "w-3/4" : "w-full"}`}>
-        <div className="py-6 px-4 w-full gap-6 flex sticky top-0 bg-black border-b-8 border-layout-light items-center z-10">
-          <div className="text-white uppercase font-extrabold text-5xl">
-            library
+        <div className="pt-6 pb-2 px-4 w-full gap-6 sticky top-0 bg-black border-b-8 border-layout-light items-center z-10">
+          <div className="flex pb-2 gap-4">
+            <div className="text-white uppercase font-extrabold text-5xl">
+              library
+            </div>
+
+            <input
+              type="text"
+              value={query}
+              className="flex-1 px-6 py-2 rounded-4xl bg-white text-black text-xl font-semibold"
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </div>
 
-          <input
-            type="text"
-            value={query}
-            className="flex-1 px-6 py-2 rounded-4xl bg-white text-black text-xl font-semibold"
-            onChange={(e) => setQuery(e.target.value)}
-          />
+          {total ? (
+            <div className="flex justify-end">
+              <SongCount count={total} />
+            </div>
+          ) : null}
         </div>
 
         <InfiniteScroll
@@ -89,7 +102,7 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
 
                 <div
                   className={`flex items-center gap-4 py-2 px-4 rounded cursor-pointer border-y-1 border-layout-dark hover:bg-layout-dark ${
-                    song.id === selectedSong?.id ? "bg-layout-dark" : ""
+                    song.id === selectedSong?.id && "bg-layout-dark"
                   }`}
                   onClick={() => setSelectedSong(song)}
                 >
