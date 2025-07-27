@@ -1,19 +1,28 @@
 import SongCount from "@/components/song-count";
+import * as SongRepository from "@/repositories/songs";
 import { useEffect, useState } from "react";
 
 interface Props {
   artist: string;
-  query: string;
-  countForArtist: (artist: string, query?: string) => Promise<number>;
+  searchQuery: SongRepository.SearchQuery;
+  countForArtist: (
+    artist: string,
+    searchQuery: SongRepository.SearchQuery
+  ) => Promise<number>;
   className?: string;
 }
 
-const ArtistHeader = ({ artist, query, countForArtist, className }: Props) => {
+const ArtistHeader = ({
+  artist,
+  searchQuery,
+  countForArtist,
+  className,
+}: Props) => {
   const [songCount, setSongCount] = useState<number | null>(null);
 
   useEffect(() => {
-    countForArtist(artist, query).then((count) => setSongCount(count));
-  }, [countForArtist, artist, query]);
+    countForArtist(artist, searchQuery).then((count) => setSongCount(count));
+  }, [countForArtist, artist, searchQuery]);
 
   return (
     <div

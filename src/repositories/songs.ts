@@ -1,21 +1,32 @@
 import prismaClient from "@/repositories/_prisma-client";
-
 const PER_PAGE = 20;
 
-const searchQuery = (query: string) => {
+export interface SearchQuery {
+  query: string;
+  guitar?: boolean;
+  bass?: boolean;
+  drums?: boolean;
+  vocals?: boolean;
+}
+
+const prismaSearchQuery = (searchQuery: SearchQuery) => {
   return {
-    AND: query.split(" ").map((subQuery) => ({
+    AND: searchQuery.query.split(" ").map((subQuery) => ({
       OR: [
         { name: { contains: subQuery } },
         { artist: { contains: subQuery } },
       ],
     })),
+    ...(searchQuery.guitar && { difficultyGuitar: { not: null } }),
+    ...(searchQuery.bass && { difficultyBass: { not: null } }),
+    ...(searchQuery.drums && { difficultyDrums: { not: null } }),
+    ...(searchQuery.vocals && { difficultyVocals: { not: null } }),
   };
 };
 
-export const search = async (query: string, skip: number = 0) => {
+export const search = async (searchQuery: SearchQuery, skip: number = 0) => {
   const songs = await prismaClient.song.findMany({
-    where: searchQuery(query),
+    where: prismaSearchQuery(searchQuery),
     orderBy: [{ artist: "asc" }, { name: "asc" }],
     take: PER_PAGE + 1,
     skip,
@@ -24,7 +35,7 @@ export const search = async (query: string, skip: number = 0) => {
   const total =
     skip === 0
       ? await prismaClient.song.count({
-          where: searchQuery(query),
+          where: prismaSearchQuery(searchQuery),
         })
       : null;
 
@@ -35,10 +46,13 @@ export const search = async (query: string, skip: number = 0) => {
   };
 };
 
-export const countForArtist = async (artist: string, query?: string) => {
+export const countForArtist = async (
+  artist: string,
+  searchQuery?: SearchQuery
+) => {
   const count = await prismaClient.song.count({
     where: {
-      ...(query ? searchQuery(query) : {}),
+      ...(searchQuery ? prismaSearchQuery(searchQuery) : {}),
       artist,
     },
   });

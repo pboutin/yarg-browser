@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${interFont.variable} antialiased`}>
+      <body className={`${interFont.variable} antialiased overflow-y-scroll`}>
         <main className="bg-background min-h-screen">{children}</main>
       </body>
     </html>

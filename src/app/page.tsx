@@ -3,14 +3,20 @@ import * as AlbumImageRepository from "@/repositories/album-images";
 import SongsScreen from "@/screens/songs";
 
 const Home = () => {
-  const search = async (query: string, skip?: number) => {
+  const search = async (
+    searchQuery: SongRepository.SearchQuery,
+    skip?: number
+  ) => {
     "use server";
-    return SongRepository.search(query, skip);
+    return SongRepository.search(searchQuery, skip);
   };
 
-  const countForArtist = async (artist: string, query?: string) => {
+  const countForArtist = async (
+    artist: string,
+    searchQuery: SongRepository.SearchQuery
+  ) => {
     "use server";
-    return SongRepository.countForArtist(artist, query);
+    return SongRepository.countForArtist(artist, searchQuery);
   };
 
   const fetchAlbumImage = async (songDirectory: string) => {
