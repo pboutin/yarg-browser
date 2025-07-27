@@ -10,6 +10,7 @@ import SongDetails from "@/screens/songs/song-details";
 import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import * as SongRepository from "@/repositories/songs";
+import ShareButton from "@/components/share-button";
 
 interface Props {
   search: (
@@ -92,6 +93,8 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
 
   return (
     <>
+      <ShareButton />
+
       <div className={`${selectedSong ? "w-3/4" : "w-full"}`}>
         <div className="pt-6 pb-2 px-4 w-full gap-6 sticky top-0 bg-black border-b-8 border-layout-light items-center z-10">
           <div className="flex pb-2 gap-4 items-center">
