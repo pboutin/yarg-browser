@@ -27,4 +27,14 @@ model Song {
   difficultyBass Int?
   difficultyDrums Int?
   difficultyVocals Int?
+
+  requests SongRequest[]
+}
+
+model SongRequest {
+  id String @id @default(uuid())
+  songId String
+  song Song @relation(fields: [songId], references: [id])
+  requestedBy String
+  createdAt DateTime @default(now())
 }
