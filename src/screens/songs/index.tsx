@@ -33,7 +33,6 @@ interface Props {
   fetchAlbumImage: (songDirectory: string) => Promise<string>;
 
   requestSong: (songId: string, requestedBy: string) => Promise<void>;
-  discardSongRequest: (songRequestId: string) => Promise<void>;
   countSongRequests: () => Promise<number>;
 }
 
@@ -42,7 +41,6 @@ const SongsScreen = ({
   countForArtist,
   fetchAlbumImage,
   requestSong,
-  discardSongRequest,
   countSongRequests,
 }: Props) => {
   const [requestInfo, setRequestInfo] = useLocalStoredState<{
@@ -86,18 +84,29 @@ const SongsScreen = ({
     requestsSelected,
   ]);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
+  const [prevSearchQuery, setPrevSearchQuery] = useState(searchQuery);
+  if (searchQuery !== prevSearchQuery) {
+    setPrevSearchQuery(searchQuery);
     setSongs([]);
     setHasMore(false);
     setTotal(null);
+  }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    let cancelled = false;
 
     search(searchQuery).then(({ songs, hasMore, total }) => {
+      if (cancelled) return;
       setSongs(songs);
       setHasMore(hasMore);
       if (total !== null) setTotal(total);
     });
-  }, [debouncedQuery, search, searchQuery]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [search, searchQuery]);
 
   const handleLoadMore = () => {
     search(searchQuery, songs.length).then(({ songs, hasMore }) => {
@@ -126,8 +135,6 @@ const SongsScreen = ({
 
     requestSong(songId, JSON.stringify(requestInfo));
   };
-
-  let latestRenderedArtist: string | null = null;
 
   return (
     <>
@@ -191,11 +198,9 @@ const SongsScreen = ({
           hasMore={hasMore}
           loader={<h4>Loading...</h4>}
         >
-          {songs.map((song) => {
+          {songs.map((song, index) => {
             const shouldRenderArtistHeader =
-              latestRenderedArtist !== song.artist;
-
-            latestRenderedArtist = song.artist;
+              index === 0 || songs[index - 1].artist !== song.artist;
 
             return (
               <div key={song.id}>

@@ -1,7 +1,7 @@
 import Button from "@/components/button";
 import CharterIcon from "@/components/charter-icon";
 import { Instruments } from "@/components/instruments";
-import { Song } from "@/generated/prisma";
+import { Song } from "@/generated/prisma/client";
 import formatDuration from "@/utilities/format-duration";
 import { useState } from "react";
 import { useEffect } from "react";

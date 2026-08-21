@@ -1,5 +1,10 @@
-import { PrismaClient } from "@/generated/prisma";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaClient } from "@/generated/prisma/client";
 
-const prismaClient = new PrismaClient();
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL ?? "file:./prisma/database.db",
+});
+
+const prismaClient = new PrismaClient({ adapter });
 
 export default prismaClient;

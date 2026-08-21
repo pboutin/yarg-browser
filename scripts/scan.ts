@@ -1,4 +1,5 @@
-import { PrismaClient, Song } from "@/generated/prisma";
+import { Song } from "@/generated/prisma/client";
+import prismaClient from "@/repositories/_prisma-client";
 import dotenv from "dotenv";
 import fs from "fs";
 import readIniFile from "./utilities/read-ini-file";
@@ -14,7 +15,6 @@ if (!SONGS_DIRECTORY) {
 }
 
 (async () => {
-  const prismaClient = new PrismaClient();
 
   console.time("Runtime");
   for (const songDirectory of fs.readdirSync(SONGS_DIRECTORY)) {

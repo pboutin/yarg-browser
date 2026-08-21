@@ -27,12 +27,7 @@ const Home = () => {
 
   const requestSong = async (songId: string, requestedBy: string) => {
     "use server";
-    return SongRequestRepository.create(songId, requestedBy);
-  };
-
-  const discardSongRequest = async (songRequestId: string) => {
-    "use server";
-    return SongRequestRepository.discard(songRequestId);
+    await SongRequestRepository.create(songId, requestedBy);
   };
 
   const countSongRequests = async () => {
@@ -46,7 +41,6 @@ const Home = () => {
       countForArtist={countForArtist}
       fetchAlbumImage={fetchAlbumImage}
       requestSong={requestSong}
-      discardSongRequest={discardSongRequest}
       countSongRequests={countSongRequests}
     />
   );

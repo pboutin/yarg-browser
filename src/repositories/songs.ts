@@ -1,4 +1,4 @@
-import { Song, SongRequest } from "@/generated/prisma";
+import { Song, SongRequest } from "@/generated/prisma/client";
 import prismaClient from "@/repositories/_prisma-client";
 const PER_PAGE = 20;
 
