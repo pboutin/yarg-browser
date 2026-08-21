@@ -16,6 +16,7 @@
     "@prisma/adapter-better-sqlite3": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "classnames": "^2.5.1",
+    "daisyui": "^5.7.20",
     "next": "^16.3.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

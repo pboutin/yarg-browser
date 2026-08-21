@@ -10,6 +10,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import type { SearchQuery } from "@/repositories/songs";
 import ShareButton from "@/components/share-button";
 import { Song } from "@/generated/prisma/client";
+import classNames from "classnames";
 
 interface Props {
   search: (
@@ -50,7 +51,7 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
   }
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    document.getElementById("songs-scroll")?.scrollTo(0, 0);
     let cancelled = false;
 
     search(searchQuery).then(({ songs, hasMore, total }) => {
@@ -76,70 +77,93 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
     <>
       <ShareButton />
 
-      <div className={`${selectedSong ? "w-3/4" : "w-full"}`}>
-        <div className="pt-6 pb-2 px-4 w-full gap-6 sticky top-0 bg-black border-b-8 border-layout-light items-center z-10">
-          <div className="flex pb-2 gap-4 items-center">
-            <div className="text-white uppercase font-extrabold text-5xl">
-              library
-            </div>
+      <div className="flex h-full">
+        <div className="flex flex-1 flex-col min-h-0 min-w-0">
+          <div className="py-4 px-4 w-full gap-6 bg-black border-b-8 border-layout-light items-center">
+            <div className="flex gap-8 items-center">
+              <div className="flex gap-8 flex-1 items-center">
+                <div className="text-white uppercase font-extrabold text-4xl">
+                  library
+                </div>
 
-            <input
-              type="text"
-              value={query}
-              className="flex-1 px-6 py-2 rounded-4xl bg-white text-black text-xl font-semibold"
-              onChange={(e) => setQuery(e.target.value)}
-            />
+                <input
+                  type="text"
+                  value={query}
+                  className="input input-md w-full"
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+              <div className="">
+                {total ? <SongCount count={total} /> : null}
+              </div>
+            </div>
           </div>
 
-          {total ? (
-            <div className="flex justify-end">
-              <SongCount count={total} />
-            </div>
-          ) : null}
+          <div id="songs-scroll" className="flex-1 min-h-0 overflow-y-auto">
+            <InfiniteScroll
+              dataLength={songs.length}
+              next={handleLoadMore}
+              hasMore={hasMore}
+              loader={<h4>Loading...</h4>}
+              scrollableTarget="songs-scroll"
+            >
+              {songs.map((song, index) => {
+                const shouldRenderArtistHeader =
+                  index === 0 || songs[index - 1].artist !== song.artist;
+
+                return (
+                  <div key={song.id}>
+                    {shouldRenderArtistHeader ? (
+                      <ArtistHeader
+                        artist={song.artist}
+                        searchQuery={searchQuery}
+                        countForArtist={countForArtist}
+                      />
+                    ) : null}
+
+                    <div
+                      className={classNames(
+                        "flex items-center gap-4 py-2 px-4 rounded cursor-pointer border-y-1 border-layout-dark hover:bg-layout-dark",
+                        {
+                          "bg-layout-light": song.id === selectedSong?.id,
+                        },
+                      )}
+                      onClick={() => setSelectedSong(song)}
+                    >
+                      <CharterIcon charterId={song.charterId} size={32} />
+
+                      <div
+                        className={classNames(
+                          "text-xl flex-1",
+                          song.id === selectedSong?.id
+                            ? "text-white font-bold"
+                            : "text-primary",
+                        )}
+                      >
+                        {song.name}
+                      </div>
+                      <div
+                        className={classNames(
+                          "text-md italic flex-1",
+                          song.id === selectedSong?.id
+                            ? "text-white font-bold"
+                            : "text-secondary",
+                        )}
+                      >
+                        {song.artist}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </InfiniteScroll>
+          </div>
         </div>
 
-        <InfiniteScroll
-          dataLength={songs.length}
-          next={handleLoadMore}
-          hasMore={hasMore}
-          loader={<h4>Loading...</h4>}
-        >
-          {songs.map((song, index) => {
-            const shouldRenderArtistHeader =
-              index === 0 || songs[index - 1].artist !== song.artist;
-
-            return (
-              <div key={song.id}>
-                {shouldRenderArtistHeader ? (
-                  <ArtistHeader
-                    artist={song.artist}
-                    searchQuery={searchQuery}
-                    countForArtist={countForArtist}
-                  />
-                ) : null}
-
-                <div
-                  className={`flex items-center gap-4 py-2 px-4 rounded cursor-pointer border-y-1 border-layout-dark hover:bg-layout-dark ${
-                    song.id === selectedSong?.id && "bg-layout-dark"
-                  }`}
-                  onClick={() => setSelectedSong(song)}
-                >
-                  <CharterIcon charterId={song.charterId} size={32} />
-
-                  <div className="text-primary text-xl flex-1">{song.name}</div>
-                  <div className="text-secondary text-md italic flex-1">
-                    {song.artist}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </InfiniteScroll>
+        {selectedSong ? (
+          <SongDetails song={selectedSong} fetchAlbumImage={fetchAlbumImage} />
+        ) : null}
       </div>
-
-      {selectedSong ? (
-        <SongDetails song={selectedSong} fetchAlbumImage={fetchAlbumImage} />
-      ) : null}
     </>
   );
 };

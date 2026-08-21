@@ -17,7 +17,7 @@ const SongDetails = ({ song, fetchAlbumImage }: Props) => {
   }, [song.directory, fetchAlbumImage]);
 
   return (
-    <div className="fixed right-0 w-1/4 top-0">
+    <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto">
       <div className="bg-background flex flex-col gap-4">
         {albumImage ? (
           // eslint-disable-next-line @next/next/no-img-element
