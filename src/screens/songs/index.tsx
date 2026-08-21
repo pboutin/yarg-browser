@@ -1,39 +1,31 @@
 "use client";
 
 import CharterIcon from "@/components/charter-icon";
-import { Instruments } from "@/components/instruments";
 import SongCount from "@/components/song-count";
 import useDebouncedValue from "@/hooks/use-debounced-value";
 import ArtistHeader from "@/screens/songs/artist-header";
 import SongDetails from "@/screens/songs/song-details";
 import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import * as SongRepository from "@/repositories/songs";
+import type { SearchQuery } from "@/repositories/songs";
 import ShareButton from "@/components/share-button";
 import { Song } from "@/generated/prisma/client";
 
 interface Props {
   search: (
-    searchQuery: SongRepository.SearchQuery,
-    skip?: number
+    searchQuery: SearchQuery,
+    skip?: number,
   ) => Promise<{
     songs: Song[];
     hasMore: boolean;
     total: number | null;
   }>;
-  countForArtist: (
-    artist: string,
-    searchQuery: SongRepository.SearchQuery
-  ) => Promise<number>;
+  countForArtist: (artist: string, searchQuery: SearchQuery) => Promise<number>;
   fetchAlbumImage: (songDirectory: string) => Promise<string>;
 }
 
 const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
   const [query, setQuery] = useState("");
-  const [guitarSelected, setGuitarSelected] = useState(false);
-  const [bassSelected, setBassSelected] = useState(false);
-  const [drumsSelected, setDrumsSelected] = useState(false);
-  const [vocalsSelected, setVocalsSelected] = useState(false);
 
   const [songs, setSongs] = useState<Song[]>([]);
   const [total, setTotal] = useState<number | null>(null);
@@ -46,18 +38,8 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
   const searchQuery = useMemo(() => {
     return {
       query: debouncedQuery,
-      guitar: guitarSelected,
-      bass: bassSelected,
-      drums: drumsSelected,
-      vocals: vocalsSelected,
     };
-  }, [
-    debouncedQuery,
-    guitarSelected,
-    bassSelected,
-    drumsSelected,
-    vocalsSelected,
-  ]);
+  }, [debouncedQuery]);
 
   const [prevSearchQuery, setPrevSearchQuery] = useState(searchQuery);
   if (searchQuery !== prevSearchQuery) {
@@ -90,16 +72,6 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
     });
   };
 
-  const handleBandSelect = () => {
-    const value =
-      guitarSelected && bassSelected && drumsSelected && vocalsSelected;
-
-    setGuitarSelected(!value);
-    setBassSelected(!value);
-    setDrumsSelected(!value);
-    setVocalsSelected(!value);
-  };
-
   return (
     <>
       <ShareButton />
@@ -116,19 +88,6 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
               value={query}
               className="flex-1 px-6 py-2 rounded-4xl bg-white text-black text-xl font-semibold"
               onChange={(e) => setQuery(e.target.value)}
-            />
-
-            <Instruments
-              size={44}
-              guitar={guitarSelected}
-              bass={bassSelected}
-              drums={drumsSelected}
-              vocals={vocalsSelected}
-              onGuitarSelect={() => setGuitarSelected((prev) => !prev)}
-              onBassSelect={() => setBassSelected((prev) => !prev)}
-              onDrumsSelect={() => setDrumsSelected((prev) => !prev)}
-              onVocalsSelect={() => setVocalsSelected((prev) => !prev)}
-              onBandSelect={handleBandSelect}
             />
           </div>
 
@@ -171,15 +130,6 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
                   <div className="text-secondary text-md italic flex-1">
                     {song.artist}
                   </div>
-
-                  <Instruments
-                    className="ml-auto"
-                    size={32}
-                    guitar={song.difficultyGuitar}
-                    bass={song.difficultyBass}
-                    drums={song.difficultyDrums}
-                    vocals={song.difficultyVocals}
-                  />
                 </div>
               </div>
             );

@@ -1,9 +1,11 @@
-import { Song } from "@/generated/prisma/client";
-import prismaClient from "@/repositories/_prisma-client";
 import dotenv from "dotenv";
 import fs from "fs";
 import readIniFile from "./utilities/read-ini-file";
-import crypto from "crypto";
+
+import { computeSongChecksum } from "./utilities/checksum";
+import { listChartedInstruments } from "./utilities/instruments";
+import { Song } from "@/types";
+import * as SongsRepository from "@/repositories/songs";
 
 dotenv.config();
 
@@ -15,10 +17,12 @@ if (!SONGS_DIRECTORY) {
 }
 
 (async () => {
-
   console.time("Runtime");
   for (const songDirectory of fs.readdirSync(SONGS_DIRECTORY)) {
-    const songIniPath = `${SONGS_DIRECTORY}/${songDirectory}/song.ini`;
+    const currentSongDirectory = `${SONGS_DIRECTORY}/${songDirectory}`;
+    const songIniPath = `${currentSongDirectory}/song.ini`;
+
+    console.log(`Processing ${songDirectory}...`);
 
     if (!fs.existsSync(songIniPath)) {
       console.warn(`${songDirectory} has no song.ini`);
@@ -26,8 +30,8 @@ if (!SONGS_DIRECTORY) {
     }
 
     const songIniContent = readIniFile(songIniPath);
-
-    const songId = crypto.createHash("md5").update(songDirectory).digest("hex");
+    const checksum = computeSongChecksum(currentSongDirectory);
+    const instruments = listChartedInstruments(currentSongDirectory);
 
     const song: Omit<Song, "id"> = {
       name: songIniContent.name,
@@ -35,31 +39,21 @@ if (!SONGS_DIRECTORY) {
       artist: songIniContent.artist,
       album: songIniContent.album,
       genre: songIniContent.genre,
-      year: parseInt(songIniContent.year),
+      year: songIniContent.year,
       charter: songIniContent.charter,
       charterId: songIniContent.icon,
       length: parseInt(songIniContent.song_length),
-      difficultyGuitar: parseInt(songIniContent.diff_guitar),
-      difficultyBass: parseInt(songIniContent.diff_bass),
-      difficultyDrums: parseInt(songIniContent.diff_drums),
-      difficultyVocals: parseInt(songIniContent.diff_vocals),
+      checksum,
+      instrumentsJson: JSON.stringify(instruments),
     };
 
-    await prismaClient.song.upsert({
-      where: { id: songId },
-      update: song,
-      create: {
-        id: songId,
-        ...song,
-      },
-    });
+    await SongsRepository.upsert(song);
   }
 
   console.timeEnd("Runtime");
 
-  const totalSongs = await prismaClient.song.count();
+  const totalSongs = await SongsRepository.countAll();
 
-  await prismaClient.$disconnect();
-  console.log(`Done. Total songs: ${totalSongs}`);
+  console.log(`Donezo. Total songs: ${totalSongs}`);
   process.exit(0);
 })();

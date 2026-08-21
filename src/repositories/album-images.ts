@@ -2,17 +2,19 @@ import { resolveEnv } from "@/utilities/environment";
 import fs from "fs";
 import path from "path";
 
-export const fetch = async (songDirectory: string) => {
-  const imagePath = path.join(
-    resolveEnv("SONGS_PATH"),
-    songDirectory,
-    "album.jpg"
-  );
+const POSSIBLE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
 
-  if (!fs.existsSync(imagePath)) {
-    throw new Error(`Album image not found for ${songDirectory}`);
+export const fetch = async (songDirectory: string) => {
+  for (const extension of POSSIBLE_EXTENSIONS) {
+    const imagePath = path.join(
+      resolveEnv("SONGS_PATH"),
+      songDirectory,
+      `album${extension}`,
+    );
+    if (fs.existsSync(imagePath)) {
+      return fs.readFileSync(imagePath).toString("base64");
+    }
   }
 
-  const image = fs.readFileSync(imagePath);
-  return image.toString("base64");
+  throw new Error(`Album image not found for ${songDirectory}`);
 };

@@ -1,0 +1,32 @@
+import { Song as PrismaSong } from "@/generated/prisma/client";
+
+export type Song = PrismaSong;
+
+export enum Instrument {
+  // 0–9: 5-fret guitar
+  FiveFretGuitar = 0,
+  FiveFretBass = 1,
+  FiveFretRhythm = 2,
+  FiveFretCoopGuitar = 3,
+  Keys = 4,
+  // 10–19: 6-fret guitar
+  SixFretGuitar = 10,
+  SixFretBass = 11,
+  SixFretRhythm = 12,
+  SixFretCoopGuitar = 13,
+  // 20–29: drums
+  FourLaneDrums = 20,
+  ProDrums = 21,
+  FiveLaneDrums = 22,
+  EliteDrums = 23,
+  // 30–39: pro instruments
+  ProGuitar_17Fret = 30,
+  ProGuitar_22Fret = 31,
+  ProBass_17Fret = 32,
+  ProBass_22Fret = 33,
+  ProKeys = 34,
+  // 40–49: vocals
+  Vocals = 40,
+  Harmony = 41,
+  Band = 255,
+}

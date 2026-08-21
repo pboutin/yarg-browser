@@ -11,19 +11,16 @@ datasource db {
 }
 
 model Song {
-  id      String   @id
+  id      String   @id @default(uuid())
   directory String
   name    String
   artist  String
   album   String?
   genre   String?
-  year    Int?
+  year    String?
   charter String?
   charterId String?
   length Int
-  
-  difficultyGuitar Int?
-  difficultyBass Int?
-  difficultyDrums Int?
-  difficultyVocals Int?
+  checksum String @unique
+  instrumentsJson String
 }

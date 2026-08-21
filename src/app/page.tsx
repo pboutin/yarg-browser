@@ -1,22 +1,17 @@
-import * as SongRepository from "@/repositories/songs";
+import type { SearchQuery } from "@/repositories/songs";
+import * as SongsRepository from "@/repositories/songs";
 import * as AlbumImageRepository from "@/repositories/album-images";
 import SongsScreen from "@/screens/songs";
 
 const Home = () => {
-  const search = async (
-    searchQuery: SongRepository.SearchQuery,
-    skip?: number
-  ) => {
+  const search = async (searchQuery: SearchQuery, skip?: number) => {
     "use server";
-    return SongRepository.search(searchQuery, skip);
+    return SongsRepository.search(searchQuery, skip);
   };
 
-  const countForArtist = async (
-    artist: string,
-    searchQuery: SongRepository.SearchQuery
-  ) => {
+  const countForArtist = async (artist: string, searchQuery: SearchQuery) => {
     "use server";
-    return SongRepository.countForArtist(artist, searchQuery);
+    return SongsRepository.countForArtist(artist, searchQuery);
   };
 
   const fetchAlbumImage = async (songDirectory: string) => {

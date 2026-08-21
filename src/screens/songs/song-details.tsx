@@ -1,5 +1,4 @@
 import CharterIcon from "@/components/charter-icon";
-import { Instruments } from "@/components/instruments";
 import { Song } from "@/generated/prisma/client";
 import formatDuration from "@/utilities/format-duration";
 import { useState } from "react";
@@ -61,15 +60,6 @@ const SongDetails = ({ song, fetchAlbumImage }: Props) => {
           </div>
         </div>
       </div>
-
-      <Instruments
-        className="m-4 justify-between"
-        size={48}
-        guitar={song.difficultyGuitar}
-        bass={song.difficultyBass}
-        drums={song.difficultyDrums}
-        vocals={song.difficultyVocals}
-      />
     </div>
   );
 };
