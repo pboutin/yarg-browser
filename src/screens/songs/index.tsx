@@ -10,19 +10,14 @@ import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import * as SongRepository from "@/repositories/songs";
 import ShareButton from "@/components/share-button";
-import useLocalStoredState from "@/hooks/use-local-stored-state";
-import RequestInfoModal from "@/screens/songs/request-info-modal";
-import RequestInfoButton from "@/screens/songs/request-info-button";
-import { RequestInfo } from "@/types";
-import RequestsFilterButton from "@/screens/songs/requests-filter-button";
-import { SongWithRequests } from "@/repositories/songs";
-import RequestInfoBadge from "@/components/request-info-badge";
+import { Song } from "@/generated/prisma/client";
+
 interface Props {
   search: (
     searchQuery: SongRepository.SearchQuery,
     skip?: number
   ) => Promise<{
-    songs: SongWithRequests[];
+    songs: Song[];
     hasMore: boolean;
     total: number | null;
   }>;
@@ -31,38 +26,20 @@ interface Props {
     searchQuery: SongRepository.SearchQuery
   ) => Promise<number>;
   fetchAlbumImage: (songDirectory: string) => Promise<string>;
-
-  requestSong: (songId: string, requestedBy: string) => Promise<void>;
-  countSongRequests: () => Promise<number>;
 }
 
-const SongsScreen = ({
-  search,
-  countForArtist,
-  fetchAlbumImage,
-  requestSong,
-  countSongRequests,
-}: Props) => {
-  const [requestInfo, setRequestInfo] = useLocalStoredState<{
-    color: string;
-    name: string;
-  } | null>("requestInfo");
-
-  const [requestInfoModalOpened, setRequestInfoModalOpened] = useState(false);
+const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
   const [query, setQuery] = useState("");
   const [guitarSelected, setGuitarSelected] = useState(false);
   const [bassSelected, setBassSelected] = useState(false);
   const [drumsSelected, setDrumsSelected] = useState(false);
   const [vocalsSelected, setVocalsSelected] = useState(false);
-  const [requestsSelected, setRequestsSelected] = useState(false);
 
-  const [songs, setSongs] = useState<SongWithRequests[]>([]);
+  const [songs, setSongs] = useState<Song[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(false);
 
-  const [selectedSong, setSelectedSong] = useState<SongWithRequests | null>(
-    null
-  );
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
 
   const debouncedQuery = useDebouncedValue(query, 1000);
 
@@ -73,7 +50,6 @@ const SongsScreen = ({
       bass: bassSelected,
       drums: drumsSelected,
       vocals: vocalsSelected,
-      requested: requestsSelected,
     };
   }, [
     debouncedQuery,
@@ -81,7 +57,6 @@ const SongsScreen = ({
     bassSelected,
     drumsSelected,
     vocalsSelected,
-    requestsSelected,
   ]);
 
   const [prevSearchQuery, setPrevSearchQuery] = useState(searchQuery);
@@ -125,32 +100,9 @@ const SongsScreen = ({
     setVocalsSelected(!value);
   };
 
-  const handleRequestInfoChange = (requestInfo: RequestInfo) => {
-    setRequestInfo(requestInfo);
-    setRequestInfoModalOpened(false);
-  };
-
-  const handleRequestSong = (songId: string) => {
-    if (!requestInfo) return;
-
-    requestSong(songId, JSON.stringify(requestInfo));
-  };
-
   return (
     <>
       <ShareButton />
-      <RequestInfoButton
-        hasRequestInfo={!!requestInfo}
-        onClick={() => setRequestInfoModalOpened(true)}
-      />
-
-      {requestInfoModalOpened ? (
-        <RequestInfoModal
-          requestInfo={requestInfo}
-          onClose={() => setRequestInfoModalOpened(false)}
-          onChange={handleRequestInfoChange}
-        />
-      ) : null}
 
       <div className={`${selectedSong ? "w-3/4" : "w-full"}`}>
         <div className="pt-6 pb-2 px-4 w-full gap-6 sticky top-0 bg-black border-b-8 border-layout-light items-center z-10">
@@ -177,11 +129,6 @@ const SongsScreen = ({
               onDrumsSelect={() => setDrumsSelected((prev) => !prev)}
               onVocalsSelect={() => setVocalsSelected((prev) => !prev)}
               onBandSelect={handleBandSelect}
-            />
-
-            <RequestsFilterButton
-              countSongRequests={countSongRequests}
-              onClick={() => setRequestsSelected((prev) => !prev)}
             />
           </div>
 
@@ -221,21 +168,9 @@ const SongsScreen = ({
                   <CharterIcon charterId={song.charterId} size={32} />
 
                   <div className="text-primary text-xl flex-1">{song.name}</div>
-
-                  {song.requests.length > 0 ? (
-                    <div className="flex items-center gap-2">
-                      {song.requests.map((request) => (
-                        <RequestInfoBadge
-                          key={request.id}
-                          rawRequestInfo={request.requestedBy}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-secondary text-md italic flex-1">
-                      {song.artist}
-                    </div>
-                  )}
+                  <div className="text-secondary text-md italic flex-1">
+                    {song.artist}
+                  </div>
 
                   <Instruments
                     className="ml-auto"
@@ -253,11 +188,7 @@ const SongsScreen = ({
       </div>
 
       {selectedSong ? (
-        <SongDetails
-          song={selectedSong}
-          fetchAlbumImage={fetchAlbumImage}
-          onRequestSong={handleRequestSong}
-        />
+        <SongDetails song={selectedSong} fetchAlbumImage={fetchAlbumImage} />
       ) : null}
     </>
   );

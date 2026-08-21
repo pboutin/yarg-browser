@@ -1,4 +1,3 @@
-import Button from "@/components/button";
 import CharterIcon from "@/components/charter-icon";
 import { Instruments } from "@/components/instruments";
 import { Song } from "@/generated/prisma/client";
@@ -9,10 +8,9 @@ import { useEffect } from "react";
 interface Props {
   song: Song;
   fetchAlbumImage: (songDirectory: string) => Promise<string>;
-  onRequestSong: (songId: string) => void;
 }
 
-const SongDetails = ({ song, fetchAlbumImage, onRequestSong }: Props) => {
+const SongDetails = ({ song, fetchAlbumImage }: Props) => {
   const [albumImage, setAlbumImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,12 +28,6 @@ const SongDetails = ({ song, fetchAlbumImage, onRequestSong }: Props) => {
             className="w-full"
           />
         ) : null}
-
-        <Button
-          label="Request Song"
-          icon="music"
-          onClick={() => onRequestSong(song.id)}
-        />
 
         <div className="flex flex-col gap-1 px-4">
           <div className="text-white text-3xl font-bold">{song.name}</div>

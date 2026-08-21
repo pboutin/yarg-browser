@@ -1,4 +1,3 @@
-import { Song, SongRequest } from "@/generated/prisma/client";
 import prismaClient from "@/repositories/_prisma-client";
 const PER_PAGE = 20;
 
@@ -8,10 +7,7 @@ export interface SearchQuery {
   bass?: boolean;
   drums?: boolean;
   vocals?: boolean;
-  requested?: boolean;
 }
-
-export type SongWithRequests = Song & { requests: SongRequest[] };
 
 const prismaSearchQuery = (searchQuery: SearchQuery) => {
   return {
@@ -25,34 +21,15 @@ const prismaSearchQuery = (searchQuery: SearchQuery) => {
     ...(searchQuery.bass && { difficultyBass: { not: null } }),
     ...(searchQuery.drums && { difficultyDrums: { not: null } }),
     ...(searchQuery.vocals && { difficultyVocals: { not: null } }),
-    ...(searchQuery.requested && {
-      songRequests: {
-        some: {
-          requestedBy: {
-            not: null,
-          },
-        },
-      },
-    }),
   };
 };
 
-export const search = async (
-  searchQuery: SearchQuery,
-  skip: number = 0
-): Promise<{
-  total: number | null;
-  songs: Array<SongWithRequests>;
-  hasMore: boolean;
-}> => {
+export const search = async (searchQuery: SearchQuery, skip: number = 0) => {
   const songs = await prismaClient.song.findMany({
     where: prismaSearchQuery(searchQuery),
     orderBy: [{ artist: "asc" }, { name: "asc" }],
     take: PER_PAGE + 1,
     skip,
-    include: {
-      requests: true,
-    },
   });
 
   const total =
