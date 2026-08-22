@@ -4,6 +4,7 @@ import SongSidePanel from "@/components/song-side-panel";
 import { CompleteScore, Song } from "@/types";
 import { useMemo } from "react";
 import ScoresHistory from "@/screens/song/scores-history";
+import ScoresCharts from "@/screens/song/scores-charts";
 
 interface Props {
   song: Song;
@@ -21,7 +22,7 @@ const SongScreen = ({ song, scores, fetchAlbumImage }: Props) => {
   return (
     <div className="flex h-full">
       <ScoresHistory scores={scores} bestScore={bestScore} />
-      <div className="flex-1 ">CHARTS</div>
+      <ScoresCharts scores={scores} />
       <SongSidePanel song={song} fetchAlbumImage={fetchAlbumImage} />
     </div>
   );
