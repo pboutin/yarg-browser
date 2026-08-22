@@ -1,28 +1,22 @@
+"use client";
+
 import SongCount from "@/components/song-count";
-import * as SongRepository from "@/repositories/songs";
+import type { SearchQuery } from "@/repositories/songs";
 import { useEffect, useState } from "react";
+import { countForArtist } from "./actions";
 
 interface Props {
   artist: string;
-  searchQuery: SongRepository.SearchQuery;
-  countForArtist: (
-    artist: string,
-    searchQuery: SongRepository.SearchQuery,
-  ) => Promise<number>;
+  searchQuery: SearchQuery;
   className?: string;
 }
 
-const ArtistHeader = ({
-  artist,
-  searchQuery,
-  countForArtist,
-  className,
-}: Props) => {
+const ArtistHeader = ({ artist, searchQuery, className }: Props) => {
   const [songCount, setSongCount] = useState<number | null>(null);
 
   useEffect(() => {
     countForArtist(artist, searchQuery).then((count) => setSongCount(count));
-  }, [countForArtist, artist, searchQuery]);
+  }, [artist, searchQuery]);
 
   return (
     <div

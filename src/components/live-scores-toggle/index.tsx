@@ -2,14 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-
-interface Props {
-  fetchLatestSongId: () => Promise<string | null>;
-}
+import { fetchLatestSongId } from "./actions";
 
 const POLL_INTERVAL_MS = 5000;
 
-const LiveScoresToggle = ({ fetchLatestSongId }: Props) => {
+const LiveScoresToggle = () => {
   const router = useRouter();
   const [enabled, setEnabled] = useState(false);
   const lastSongIdRef = useRef<string | null>(null);
@@ -46,7 +43,7 @@ const LiveScoresToggle = ({ fetchLatestSongId }: Props) => {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [enabled, fetchLatestSongId, router]);
+  }, [enabled, router]);
 
   return (
     <label className="label cursor-pointer gap-2">

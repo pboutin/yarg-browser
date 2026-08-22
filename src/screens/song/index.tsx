@@ -9,10 +9,9 @@ import ScoresCharts from "@/screens/song/scores-charts";
 interface Props {
   song: Song;
   scores: CompleteScore[];
-  fetchAlbumImage: (songDirectory: string) => Promise<string>;
 }
 
-const SongScreen = ({ song, scores, fetchAlbumImage }: Props) => {
+const SongScreen = ({ song, scores }: Props) => {
   const bestScore = useMemo(() => {
     return scores.reduce((best, score) => {
       return score.score > best.score ? score : best;
@@ -23,7 +22,7 @@ const SongScreen = ({ song, scores, fetchAlbumImage }: Props) => {
     <div className="flex h-full">
       <ScoresHistory scores={scores} bestScore={bestScore} />
       <ScoresCharts scores={scores} />
-      <SongSidePanel song={song} fetchAlbumImage={fetchAlbumImage} />
+      <SongSidePanel song={song} />
     </div>
   );
 };

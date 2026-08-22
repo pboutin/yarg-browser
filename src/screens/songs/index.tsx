@@ -7,26 +7,13 @@ import ArtistHeader from "@/screens/songs/artist-header";
 import SongSidePanel from "@/components/song-side-panel";
 import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import type { SearchQuery } from "@/repositories/songs";
 import ShareButton from "@/components/share-button";
 import { Song } from "@/generated/prisma/client";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
+import { search } from "./actions";
 
-interface Props {
-  search: (
-    searchQuery: SearchQuery,
-    skip?: number,
-  ) => Promise<{
-    songs: Song[];
-    hasMore: boolean;
-    total: number | null;
-  }>;
-  countForArtist: (artist: string, searchQuery: SearchQuery) => Promise<number>;
-  fetchAlbumImage: (songDirectory: string) => Promise<string>;
-}
-
-const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
+const SongsScreen = () => {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
@@ -66,7 +53,7 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
     return () => {
       cancelled = true;
     };
-  }, [search, searchQuery]);
+  }, [searchQuery]);
 
   const handleLoadMore = () => {
     search(searchQuery, songs.length).then(({ songs, hasMore }) => {
@@ -123,7 +110,6 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
                       <ArtistHeader
                         artist={song.artist}
                         searchQuery={searchQuery}
-                        countForArtist={countForArtist}
                       />
                     ) : null}
 
@@ -167,12 +153,7 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
           </div>
         </div>
 
-        {selectedSong ? (
-          <SongSidePanel
-            song={selectedSong}
-            fetchAlbumImage={fetchAlbumImage}
-          />
-        ) : null}
+        {selectedSong ? <SongSidePanel song={selectedSong} /> : null}
       </div>
     </>
   );

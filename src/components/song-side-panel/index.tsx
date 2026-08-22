@@ -1,20 +1,21 @@
+"use client";
+
 import CharterIcon from "@/components/charter-icon";
 import { Song } from "@/generated/prisma/client";
 import formatDuration from "@/utilities/format-duration";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { fetchAlbumImage } from "./actions";
 
 interface Props {
   song: Song;
-  fetchAlbumImage: (songDirectory: string) => Promise<string>;
 }
 
-const SongSidePanel = ({ song, fetchAlbumImage }: Props) => {
+const SongSidePanel = ({ song }: Props) => {
   const [albumImage, setAlbumImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAlbumImage(song.directory).then(setAlbumImage);
-  }, [song.directory, fetchAlbumImage]);
+  }, [song.directory]);
 
   return (
     <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto">

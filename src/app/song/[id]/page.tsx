@@ -2,7 +2,6 @@ import SongScreen from "@/screens/song";
 import * as SongsRepository from "@/repositories/songs";
 import * as ScoresRepository from "@/repositories/scores";
 import { notFound } from "next/navigation";
-import * as AlbumImageRepository from "@/repositories/album-images";
 import { Difficulty, Instrument } from "@/types";
 
 interface Props {
@@ -25,14 +24,7 @@ const SongPage = async ({ params }: Props) => {
     Difficulty.Expert,
   );
 
-  const fetchAlbumImage = async (songDirectory: string) => {
-    "use server";
-    return AlbumImageRepository.fetch(songDirectory);
-  };
-
-  return (
-    <SongScreen song={song} scores={scores} fetchAlbumImage={fetchAlbumImage} />
-  );
+  return <SongScreen song={song} scores={scores} />;
 };
 
 export default SongPage;
