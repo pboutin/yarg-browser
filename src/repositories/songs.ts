@@ -17,6 +17,12 @@ const prismaSearchQuery = (searchQuery: SearchQuery) => {
   };
 };
 
+export const get = async (id: string) => {
+  return await prismaClient.song.findUnique({
+    where: { id },
+  });
+};
+
 export const countAll = async () => {
   return await prismaClient.song.count();
 };

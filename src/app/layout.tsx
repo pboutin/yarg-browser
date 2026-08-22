@@ -24,6 +24,9 @@ export default function RootLayout({
       >
         <nav className="navbar bg-background border-b-8 border-layout-light">
           <a className="btn btn-ghost text-xl">YARG Browser</a>
+          <a href="/" className="btn btn-ghost">
+            Library
+          </a>
         </nav>
         <main className="bg-background flex-1 min-h-0 overflow-hidden">
           {children}

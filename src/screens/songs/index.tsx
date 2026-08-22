@@ -4,13 +4,14 @@ import CharterIcon from "@/components/charter-icon";
 import SongCount from "@/components/song-count";
 import useDebouncedValue from "@/hooks/use-debounced-value";
 import ArtistHeader from "@/screens/songs/artist-header";
-import SongDetails from "@/screens/songs/song-details";
+import SongSidePanel from "@/components/song-side-panel";
 import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import type { SearchQuery } from "@/repositories/songs";
 import ShareButton from "@/components/share-button";
 import { Song } from "@/generated/prisma/client";
 import classNames from "classnames";
+import { useRouter } from "next/navigation";
 
 interface Props {
   search: (
@@ -26,6 +27,7 @@ interface Props {
 }
 
 const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
+  const router = useRouter();
   const [query, setQuery] = useState("");
 
   const [songs, setSongs] = useState<Song[]>([]);
@@ -71,6 +73,10 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
       setSongs((prevSongs) => prevSongs.concat(songs));
       setHasMore(hasMore);
     });
+  };
+
+  const handleNavigatingToSong = (song: Song) => {
+    router.push(`/song/${song.id}`);
   };
 
   return (
@@ -129,6 +135,7 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
                         },
                       )}
                       onClick={() => setSelectedSong(song)}
+                      onDoubleClick={() => handleNavigatingToSong(song)}
                     >
                       <CharterIcon charterId={song.charterId} size={32} />
 
@@ -161,7 +168,10 @@ const SongsScreen = ({ search, countForArtist, fetchAlbumImage }: Props) => {
         </div>
 
         {selectedSong ? (
-          <SongDetails song={selectedSong} fetchAlbumImage={fetchAlbumImage} />
+          <SongSidePanel
+            song={selectedSong}
+            fetchAlbumImage={fetchAlbumImage}
+          />
         ) : null}
       </div>
     </>

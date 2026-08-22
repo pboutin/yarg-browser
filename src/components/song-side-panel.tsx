@@ -9,7 +9,7 @@ interface Props {
   fetchAlbumImage: (songDirectory: string) => Promise<string>;
 }
 
-const SongDetails = ({ song, fetchAlbumImage }: Props) => {
+const SongSidePanel = ({ song, fetchAlbumImage }: Props) => {
   const [albumImage, setAlbumImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -64,4 +64,4 @@ const SongDetails = ({ song, fetchAlbumImage }: Props) => {
   );
 };
 
-export default SongDetails;
+export default SongSidePanel;
