@@ -42,7 +42,11 @@ next-env.d.ts
 
 # Prisma
 /src/generated/prisma
+/src/generated/prisma-scores
 /prisma/*.db
 
 # Songs directory
 /songs
+
+# scores.db (dev debug)
+scores.db

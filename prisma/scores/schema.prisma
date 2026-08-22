@@ -1,0 +1,63 @@
+// Read-only schema for YARG's scores.db (owned by another app).
+// Do not run migrate / db push against this database.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../src/generated/prisma-scores"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model GameRecord {
+  id               Int           @id @default(autoincrement()) @map("Id")
+  date             BigInt?       @map("Date")
+  songChecksum     Bytes?        @map("SongChecksum")
+  gameVersion      String?       @map("GameVersion")
+  songName         String?       @map("SongName")
+  songArtist       String?       @map("SongArtist")
+  songCharter      String?       @map("SongCharter")
+  replayFileName   String?       @map("ReplayFileName")
+  replayChecksum   Bytes?        @map("ReplayChecksum")
+  bandScore        Int?          @map("BandScore")
+  bandStars        Int?          @map("BandStars")
+  songSpeed        Float?        @map("SongSpeed")
+  playedWithReplay Int?          @map("PlayedWithReplay")
+  playerScores     PlayerScore[]
+
+  @@index([date], map: "GameRecords_Date")
+  @@index([songChecksum], map: "GameRecords_SongChecksum")
+  @@map("GameRecords")
+}
+
+model PlayerScore {
+  id             Int         @id @default(autoincrement()) @map("Id")
+  gameRecordId   Int?        @map("GameRecordId")
+  playerId       String?     @map("PlayerId")
+  instrument     Int?        @map("Instrument")
+  difficulty     Int?        @map("Difficulty")
+  enginePresetId String?     @map("EnginePresetId")
+  score          Int?        @map("Score")
+  stars          Int?        @map("Stars")
+  notesHit       Int?        @map("NotesHit")
+  notesMissed    Int?        @map("NotesMissed")
+  isFc           Int?        @map("IsFc")
+  isReplay       Int?        @map("IsReplay")
+  percent        Float?      @map("Percent")
+  gameRecord     GameRecord? @relation(fields: [gameRecordId], references: [id])
+  player         Player?     @relation(fields: [playerId], references: [id])
+
+  @@index([gameRecordId], map: "PlayerScores_GameRecordId")
+  @@index([playerId], map: "PlayerScores_PlayerId")
+  @@index([instrument], map: "PlayerScores_Instrument")
+  @@map("PlayerScores")
+}
+
+model Player {
+  id     String        @id @map("Id")
+  name   String?       @map("Name")
+  scores PlayerScore[]
+
+  @@map("Players")
+}

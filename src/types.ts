@@ -2,6 +2,15 @@ import { Song as PrismaSong } from "@/generated/prisma/client";
 
 export type Song = PrismaSong;
 
+export enum Difficulty {
+  Beginner = 0,
+  Easy = 1,
+  Normal = 2,
+  Hard = 3,
+  Expert = 4,
+  ExpertPlus = 5,
+}
+
 export enum Instrument {
   // 0–9: 5-fret guitar
   FiveFretGuitar = 0,
@@ -29,4 +38,16 @@ export enum Instrument {
   Vocals = 40,
   Harmony = 41,
   Band = 255,
+}
+
+export interface CompleteScore {
+  id: string;
+  date: Date;
+  gameVersion: string;
+  score: number;
+  stars: number;
+  percent: number;
+  notesHit: number;
+  notesMissed: number;
+  isFc: boolean;
 }

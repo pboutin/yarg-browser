@@ -9,19 +9,23 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:init": "rm -f prisma/database.db && touch prisma/database.db && npm run db:update",
-    "db:update": "prisma db push && prisma generate && tsx scripts/scan.ts",
-    "db:studio": "prisma studio"
+    "db:update": "prisma db push && prisma generate && npm run db:scores:generate && tsx scripts/scan.ts",
+    "db:studio": "prisma studio",
+    "db:scores:generate": "prisma generate --config prisma.scores.config.ts",
+    "db:scores:studio": "prisma studio --config prisma.scores.config.ts --port 5556"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "classnames": "^2.5.1",
     "daisyui": "^5.7.20",
+    "date-fns": "^4.4.0",
     "next": "^16.3.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-infinite-scroll-component": "^7.2.1",
-    "react-qr-code": "^2.2.0"
+    "react-qr-code": "^2.2.0",
+    "ts-pattern": "^5.9.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
