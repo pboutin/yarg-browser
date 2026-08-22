@@ -1,10 +1,54 @@
 import prismaScoresClient from "@/repositories/_prisma-scores-client";
-import { CompleteScore, Difficulty, Instrument } from "@/types";
+import { CompleteScore, Difficulty, Instrument, ScoreMetadata } from "@/types";
 
 /** .NET DateTime ticks (100ns since 0001-01-01) → JS Date */
 const ticksToDate = (ticks: bigint): Date => {
   const epochTicks = BigInt("621355968000000000");
   return new Date(Number((ticks - epochTicks) / BigInt(10000)));
+};
+
+export const findLatestForPlayer = async (
+  playerId: string,
+): Promise<ScoreMetadata | null> => {
+  const score = await prismaScoresClient.playerScore.findFirst({
+    where: {
+      playerId,
+      instrument: { not: null },
+      difficulty: { not: null },
+      gameRecord: {
+        date: { not: null },
+        songChecksum: { not: null },
+      },
+    },
+    include: {
+      gameRecord: true,
+    },
+    orderBy: {
+      gameRecord: {
+        date: "desc",
+      },
+    },
+  });
+
+  const { gameRecord } = score ?? {};
+  if (
+    !score ||
+    !gameRecord?.songChecksum ||
+    score.instrument == null ||
+    score.difficulty == null
+  ) {
+    return null;
+  }
+
+  return {
+    playerId,
+    gameRecordId: gameRecord.id,
+    songChecksum: Buffer.from(gameRecord.songChecksum)
+      .toString("hex")
+      .toUpperCase(),
+    instrument: score.instrument as Instrument,
+    difficulty: score.difficulty as Difficulty,
+  };
 };
 
 export const findAll = async (

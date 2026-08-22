@@ -40,6 +40,14 @@ export enum Instrument {
   Band = 255,
 }
 
+export interface ScoreMetadata {
+  playerId: string;
+  gameRecordId: number;
+  songChecksum: string;
+  instrument: Instrument;
+  difficulty: Difficulty;
+}
+
 export interface CompleteScore {
   id: string;
   date: Date;

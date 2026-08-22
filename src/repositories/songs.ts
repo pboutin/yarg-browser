@@ -23,6 +23,12 @@ export const get = async (id: string) => {
   });
 };
 
+export const getByChecksum = async (checksum: string) => {
+  return await prismaClient.song.findUnique({
+    where: { checksum },
+  });
+};
+
 export const countAll = async () => {
   return await prismaClient.song.count();
 };
