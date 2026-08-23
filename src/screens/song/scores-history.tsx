@@ -3,7 +3,7 @@ import { CompleteScore } from "@/types";
 import formatPercent from "@/utilities/format-percent";
 import formatScore from "@/utilities/format-score";
 import { match } from "ts-pattern";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
 interface Props {
   scores: CompleteScore[];
@@ -12,7 +12,7 @@ interface Props {
 
 const ScoresHistory = ({ scores, bestScore }: Props) => {
   return (
-    <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto flex flex-col gap-2 p-2">
+    <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto overflow-x-visible flex flex-col gap-2 p-2 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
       {scores.map((score) => (
         <div
           key={score.id}
@@ -35,12 +35,22 @@ const ScoresHistory = ({ scores, bestScore }: Props) => {
                 </div>
               </h2>
               <h2 className="card-title">
-                <div className="flex w-full justify-between items-center">
+                <div className="flex w-full  items-center">
                   {formatPercent(score.percent)}
+                  <div className="divider divider-horizontal" />
+                  {score.notesHit} / {score.notesHit + score.notesMissed}
+                  <span className="text-sm text-error font-bold ml-2 bottom-1 relative">
+                    - {score.notesMissed}
+                  </span>
                 </div>
 
-                <div className="badge badge-sm badge-secondary text-nowrap">
-                  {formatDistanceToNow(score.date, { addSuffix: true })}
+                <div
+                  className="tooltip tooltip-left"
+                  data-tip={format(score.date, "PPpp")}
+                >
+                  <div className="badge badge-sm badge-secondary text-nowrap cursor-default">
+                    {formatDistanceToNow(score.date, { addSuffix: true })}
+                  </div>
                 </div>
               </h2>
             </div>
