@@ -39,9 +39,11 @@ const ScoresHistory = ({ scores, bestScore }: Props) => {
                   {formatPercent(score.percent)}
                   <div className="divider divider-horizontal" />
                   {score.notesHit} / {score.notesHit + score.notesMissed}
-                  <span className="text-sm text-error font-bold ml-2 bottom-1 relative">
-                    - {score.notesMissed}
-                  </span>
+                  {score.notesMissed ? (
+                    <span className="text-sm text-error font-bold ml-2 bottom-1 relative">
+                      - {score.notesMissed}
+                    </span>
+                  ) : null}
                 </div>
 
                 <div
