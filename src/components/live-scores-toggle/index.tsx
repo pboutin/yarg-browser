@@ -2,36 +2,40 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchLatestSongId } from "./actions";
+import { fetchLatestScoreMetadata, fetchSongId } from "./actions";
 
 const POLL_INTERVAL_MS = 5000;
 
 const LiveScoresToggle = () => {
   const router = useRouter();
   const [enabled, setEnabled] = useState(false);
-  const lastSongIdRef = useRef<string | null>(null);
+  const lastSongChecksumRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!enabled) {
-      lastSongIdRef.current = null;
+      lastSongChecksumRef.current = null;
       return;
     }
 
     let cancelled = false;
 
     const poll = async () => {
-      const latestSongId = await fetchLatestSongId();
-      if (cancelled || !latestSongId) return;
+      const scoreMetadata = await fetchLatestScoreMetadata();
+      if (cancelled || !scoreMetadata) return;
 
-      if (lastSongIdRef.current === null) {
-        lastSongIdRef.current = latestSongId;
+      if (lastSongChecksumRef.current === null) {
+        lastSongChecksumRef.current = scoreMetadata.songChecksum;
         return;
       }
 
-      if (latestSongId !== lastSongIdRef.current) {
-        lastSongIdRef.current = latestSongId;
-        router.push(`/song/${latestSongId}`);
-      }
+      if (scoreMetadata.songChecksum === lastSongChecksumRef.current) return;
+      lastSongChecksumRef.current = scoreMetadata.songChecksum;
+
+      const songId = await fetchSongId(scoreMetadata.songChecksum);
+      console.log("songId", songId);
+      if (!songId || cancelled) return;
+
+      router.push(`/song/${songId}`);
     };
 
     void poll();
