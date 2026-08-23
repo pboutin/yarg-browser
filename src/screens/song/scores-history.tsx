@@ -41,7 +41,7 @@ const ScoresHistory = ({ scores, bestScore }: Props) => {
                   {score.notesHit} / {score.notesHit + score.notesMissed}
                   {score.notesMissed ? (
                     <span className="text-sm text-error font-bold ml-2 bottom-1 relative">
-                      - {score.notesMissed}
+                      -{score.notesMissed}
                     </span>
                   ) : null}
                 </div>

@@ -51,8 +51,8 @@ export const findLatestForPlayer = async (
 };
 
 export const findAll = async (
-  songChecksum: string,
   playerId: string,
+  songChecksum: string,
   instrument: Instrument,
   difficulty: Difficulty,
 ): Promise<CompleteScore[]> => {
@@ -106,31 +106,9 @@ export const findAll = async (
   });
 };
 
-export const playedDifficultiesForSong = async (
-  songChecksum: string,
-  playerId: string,
-): Promise<Difficulty[]> => {
-  const scores = await prismaScoresClient.playerScore.findMany({
-    where: {
-      playerId,
-      instrument: { not: null },
-      difficulty: { not: null },
-      gameRecord: {
-        songChecksum: Buffer.from(songChecksum, "hex"),
-      },
-    },
-  });
-
-  return Array.from(
-    new Set(scores.map<Difficulty>((score) => score.difficulty!)),
-  )
-    .filter((difficulty) => difficulty !== null)
-    .sort();
-};
-
 export const playedInstrumentsForSong = async (
-  songChecksum: string,
   playerId: string,
+  songChecksum: string,
 ): Promise<Instrument[]> => {
   const scores = await prismaScoresClient.playerScore.findMany({
     where: {
@@ -147,5 +125,28 @@ export const playedInstrumentsForSong = async (
     new Set(scores.map<Instrument>((score) => score.instrument!)),
   )
     .filter((instrument) => instrument !== null)
+    .sort();
+};
+
+export const playedDifficultiesForSong = async (
+  playerId: string,
+  songChecksum: string,
+  instrument: Instrument,
+): Promise<Difficulty[]> => {
+  const scores = await prismaScoresClient.playerScore.findMany({
+    where: {
+      playerId,
+      instrument,
+      difficulty: { not: null },
+      gameRecord: {
+        songChecksum: Buffer.from(songChecksum, "hex"),
+      },
+    },
+  });
+
+  return Array.from(
+    new Set(scores.map<Difficulty>((score) => score.difficulty!)),
+  )
+    .filter((difficulty) => difficulty !== null)
     .sort();
 };

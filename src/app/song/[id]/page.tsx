@@ -4,12 +4,30 @@ import * as ScoresRepository from "@/repositories/scores";
 import { notFound } from "next/navigation";
 import { Difficulty, Instrument } from "@/types";
 
+type RawSearchParams = Promise<{ instrument: string; difficulty: string }>;
+
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: RawSearchParams;
 }
 
-const SongPage = async ({ params }: Props) => {
+const parseSearchParams = async (
+  searchParams: RawSearchParams,
+): Promise<{
+  instrument: Instrument | undefined;
+  difficulty: Difficulty | undefined;
+}> => {
+  const { instrument, difficulty } = await searchParams;
+  return {
+    instrument: instrument ? Number(instrument) : undefined,
+    difficulty: difficulty ? Number(difficulty) : undefined,
+  };
+};
+
+const SongPage = async ({ params, searchParams }: Props) => {
   const { id } = await params;
+  const { instrument: instrumentParam, difficulty: difficultyParam } =
+    await parseSearchParams(searchParams);
 
   const song = await SongsRepository.get(id);
 
@@ -17,14 +35,48 @@ const SongPage = async ({ params }: Props) => {
     notFound();
   }
 
-  const scores = await ScoresRepository.findAll(
-    song.checksum,
+  const latestScore = await ScoresRepository.findLatestForPlayer(
     "316bd1b0-f06f-4526-b316-d4d50fa6c056", // InfaMc
-    Instrument.ProDrums,
-    Difficulty.Expert,
+    song.checksum,
   );
 
-  return <SongScreen song={song} scores={scores} />;
+  if (!latestScore) {
+    notFound();
+  }
+
+  const playedInstruments = await ScoresRepository.playedInstrumentsForSong(
+    "316bd1b0-f06f-4526-b316-d4d50fa6c056", // InfaMc
+    song.checksum,
+  );
+
+  const activeInstrument = instrumentParam ?? latestScore.instrument;
+
+  const playedDifficulties = await ScoresRepository.playedDifficultiesForSong(
+    "316bd1b0-f06f-4526-b316-d4d50fa6c056", // InfaMc
+    song.checksum,
+    activeInstrument,
+  );
+
+  const activeDifficulty =
+    difficultyParam ?? playedDifficulties[playedDifficulties.length - 1];
+
+  const scores = await ScoresRepository.findAll(
+    "316bd1b0-f06f-4526-b316-d4d50fa6c056", // InfaMc
+    song.checksum,
+    activeInstrument,
+    activeDifficulty,
+  );
+
+  return (
+    <SongScreen
+      song={song}
+      scores={scores}
+      playedInstruments={playedInstruments}
+      playedDifficulties={playedDifficulties}
+      activeInstrument={activeInstrument}
+      activeDifficulty={activeDifficulty}
+    />
+  );
 };
 
 export default SongPage;

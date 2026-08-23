@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchAlbumImage } from "./actions";
 import { Instrument } from "@/types";
 import Image from "next/image";
+import Instruments from "@/components/instruments";
 
 interface Props {
   song: Song;
@@ -66,20 +67,10 @@ const SongSidePanel = ({ song }: Props) => {
             <div>{formatDuration(song.length)}</div>
           </div>
           <div>
-            <div className="text-gray-400 font-semibold text-sm">
+            <div className="text-gray-400 font-semibold text-sm mb-2">
               CHARTED FOR
             </div>
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              {instruments.map((instrument) => (
-                <Image
-                  key={instrument}
-                  src={`/instruments/${instrument}.png`}
-                  alt={instrument.toString()}
-                  width={60}
-                  height={60}
-                />
-              ))}
-            </div>
+            <Instruments instruments={instruments} />
           </div>
         </div>
       </div>
