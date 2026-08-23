@@ -3,8 +3,10 @@
 import CharterIcon from "@/components/charter-icon";
 import { Song } from "@/generated/prisma/client";
 import formatDuration from "@/utilities/format-duration";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchAlbumImage } from "./actions";
+import { Instrument } from "@/types";
+import Image from "next/image";
 
 interface Props {
   song: Song;
@@ -16,6 +18,10 @@ const SongSidePanel = ({ song }: Props) => {
   useEffect(() => {
     fetchAlbumImage(song.directory).then(setAlbumImage);
   }, [song.directory]);
+
+  const instruments = useMemo(() => {
+    return JSON.parse(song.instrumentsJson) as Instrument[];
+  }, [song.instrumentsJson]);
 
   return (
     <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto">
@@ -58,6 +64,22 @@ const SongSidePanel = ({ song }: Props) => {
           <div className="flex justify-between">
             <div className="text-gray-400 font-semibold text-sm">LENGTH</div>
             <div>{formatDuration(song.length)}</div>
+          </div>
+          <div>
+            <div className="text-gray-400 font-semibold text-sm">
+              CHARTED FOR
+            </div>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              {instruments.map((instrument) => (
+                <Image
+                  key={instrument}
+                  src={`/instruments/${instrument}.png`}
+                  alt={instrument.toString()}
+                  width={60}
+                  height={60}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

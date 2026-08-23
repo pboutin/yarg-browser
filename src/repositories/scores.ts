@@ -15,6 +15,7 @@ const ticksToDate = (ticks: bigint): Date => {
 
 export const findLatestForPlayer = async (
   playerId: string,
+  songChecksum?: string,
 ): Promise<ScoreMetadata | null> => {
   const score = await prismaScoresClient.playerScore.findFirst({
     where: {
@@ -25,6 +26,9 @@ export const findLatestForPlayer = async (
         date: { not: null },
         songChecksum: { not: null },
       },
+      ...(songChecksum
+        ? { gameRecord: { songChecksum: Buffer.from(songChecksum, "hex") } }
+        : {}),
     },
     include: {
       gameRecord: true,
@@ -36,24 +40,13 @@ export const findLatestForPlayer = async (
     },
   });
 
-  const { gameRecord } = score ?? {};
-  if (
-    !score ||
-    !gameRecord?.songChecksum ||
-    score.instrument == null ||
-    score.difficulty == null
-  ) {
-    return null;
-  }
-
   return {
     playerId,
-    gameRecordId: gameRecord.id,
-    songChecksum: Buffer.from(gameRecord.songChecksum)
+    songChecksum: Buffer.from(score!.gameRecord!.songChecksum!)
       .toString("hex")
       .toUpperCase(),
-    instrument: score.instrument as Instrument,
-    difficulty: score.difficulty as Difficulty,
+    instrument: score!.instrument as Instrument,
+    difficulty: score!.difficulty as Difficulty,
   };
 };
 
@@ -111,4 +104,48 @@ export const findAll = async (
       },
     ];
   });
+};
+
+export const playedDifficultiesForSong = async (
+  songChecksum: string,
+  playerId: string,
+): Promise<Difficulty[]> => {
+  const scores = await prismaScoresClient.playerScore.findMany({
+    where: {
+      playerId,
+      instrument: { not: null },
+      difficulty: { not: null },
+      gameRecord: {
+        songChecksum: Buffer.from(songChecksum, "hex"),
+      },
+    },
+  });
+
+  return Array.from(
+    new Set(scores.map<Difficulty>((score) => score.difficulty!)),
+  )
+    .filter((difficulty) => difficulty !== null)
+    .sort();
+};
+
+export const playedInstrumentsForSong = async (
+  songChecksum: string,
+  playerId: string,
+): Promise<Instrument[]> => {
+  const scores = await prismaScoresClient.playerScore.findMany({
+    where: {
+      playerId,
+      instrument: { not: null },
+      difficulty: { not: null },
+      gameRecord: {
+        songChecksum: Buffer.from(songChecksum, "hex"),
+      },
+    },
+  });
+
+  return Array.from(
+    new Set(scores.map<Instrument>((score) => score.instrument!)),
+  )
+    .filter((instrument) => instrument !== null)
+    .sort();
 };

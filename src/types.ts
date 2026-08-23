@@ -42,7 +42,6 @@ export enum Instrument {
 
 export interface ScoreMetadata {
   playerId: string;
-  gameRecordId: number;
   songChecksum: string;
   instrument: Instrument;
   difficulty: Difficulty;
