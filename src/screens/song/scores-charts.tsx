@@ -10,11 +10,12 @@ import {
   LineElement,
   PointElement,
   LinearScale,
-  CategoryScale,
+  TimeScale,
   Tooltip,
   Filler,
   TooltipItem,
 } from "chart.js";
+import "chartjs-adapter-date-fns";
 import { format } from "date-fns";
 import { useEffect, useRef } from "react";
 
@@ -23,7 +24,7 @@ Chart.register(
   LineElement,
   PointElement,
   LinearScale,
-  CategoryScale,
+  TimeScale,
   Tooltip,
   Filler,
 );
@@ -38,7 +39,7 @@ const DATASET_STYLE = {
   backgroundColor: LINE_FILL,
   pointBackgroundColor: LINE_COLOR,
   pointBorderColor: LINE_COLOR,
-  tension: 0.25,
+  tension: 0,
   fill: true,
 } as const;
 
@@ -70,21 +71,21 @@ const COMMON_OPTIONS = {
 
 interface ChartSpec {
   label: string;
-  values: number[];
+  dataPoints: { x: number; y: number }[];
   formatValue: (value: number) => string;
 }
 
-const buildChartConfig = (
-  dateLabels: string[],
-  { label, values, formatValue }: ChartSpec,
-): ChartConfiguration<"line"> => ({
+const buildChartConfig = ({
+  label,
+  dataPoints,
+  formatValue,
+}: ChartSpec): ChartConfiguration<"line"> => ({
   type: "line",
   data: {
-    labels: dateLabels,
     datasets: [
       {
         label,
-        data: values,
+        data: dataPoints,
         ...DATASET_STYLE,
       },
     ],
@@ -95,13 +96,27 @@ const buildChartConfig = (
       ...COMMON_OPTIONS.plugins,
       tooltip: {
         callbacks: {
+          title: (items) =>
+            format(new Date(Number(items[0].parsed.x)), "MMM d, yyyy"),
           label: (context: TooltipItem<"line">) =>
-            formatValue(Number(context.raw)),
+            formatValue(Number(context.parsed.y)),
         },
       },
     },
     scales: {
       ...COMMON_OPTIONS.scales,
+      x: {
+        type: "time",
+        ...COMMON_OPTIONS.scales.x,
+        time: {
+          displayFormats: {
+            day: "MMM d, yyyy",
+            week: "MMM d, yyyy",
+            month: "MMM yyyy",
+            year: "yyyy",
+          },
+        },
+      },
       y: {
         ...COMMON_OPTIONS.scales.y,
         ticks: {
@@ -128,19 +143,22 @@ const ScoresCharts = ({ scores }: Props) => {
     const chronological = [...scores].sort(
       (a, b) => a.date.getTime() - b.date.getTime(),
     );
-    const dateLabels = chronological.map((score) =>
-      format(score.date, "MMM d, yyyy"),
-    );
+
+    const toDataPoints = (field: "score" | "percent") =>
+      chronological.map((score) => ({
+        x: score.date.getTime(),
+        y: score[field],
+      }));
 
     const charts = [
-      buildChartConfig(dateLabels, {
+      buildChartConfig({
         label: "Score",
-        values: chronological.map((score) => score.score),
+        dataPoints: toDataPoints("score"),
         formatValue: formatScore,
       }),
-      buildChartConfig(dateLabels, {
+      buildChartConfig({
         label: "Percent",
-        values: chronological.map((score) => score.percent),
+        dataPoints: toDataPoints("percent"),
         formatValue: formatPercent,
       }),
     ].map(
