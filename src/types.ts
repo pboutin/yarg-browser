@@ -7,7 +7,7 @@ export type Player = PrismaPlayer;
 export enum Difficulty {
   Beginner = 0,
   Easy = 1,
-  Normal = 2,
+  Medium = 2,
   Hard = 3,
   Expert = 4,
   ExpertPlus = 5,

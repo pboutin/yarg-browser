@@ -4,7 +4,7 @@ import classNames from "classnames";
 const DIFFICULTY_LABELS = {
   [Difficulty.Beginner]: "Beginner",
   [Difficulty.Easy]: "Easy",
-  [Difficulty.Normal]: "Normal",
+  [Difficulty.Medium]: "Medium",
   [Difficulty.Hard]: "Hard",
   [Difficulty.Expert]: "Expert",
   [Difficulty.ExpertPlus]: "Expert+",
