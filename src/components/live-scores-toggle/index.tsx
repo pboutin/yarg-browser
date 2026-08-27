@@ -1,14 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { fetchLatestScoreMetadata, fetchSongId } from "./actions";
+import useLocalStorageState from "@/hooks/use-local-storage-state";
 
 const POLL_INTERVAL_MS = 5000;
 
 const LiveScoresToggle = () => {
   const router = useRouter();
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useLocalStorageState(
+    "live-scores-enabled",
+    false,
+  );
+
   const lastSongChecksumRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -32,7 +38,6 @@ const LiveScoresToggle = () => {
       lastSongChecksumRef.current = scoreMetadata.songChecksum;
 
       const songId = await fetchSongId(scoreMetadata.songChecksum);
-      console.log("songId", songId);
       if (!songId || cancelled) return;
 
       router.push(`/song/${songId}`);
@@ -50,7 +55,7 @@ const LiveScoresToggle = () => {
   }, [enabled, router]);
 
   return (
-    <label className="label cursor-pointer gap-2">
+    <label className="label cursor-pointer gap-2 fade-in">
       <span className="label-text">Live Scores</span>
       <input
         type="checkbox"
@@ -62,4 +67,6 @@ const LiveScoresToggle = () => {
   );
 };
 
-export default LiveScoresToggle;
+export default dynamic(() => Promise.resolve(LiveScoresToggle), {
+  ssr: false,
+});
