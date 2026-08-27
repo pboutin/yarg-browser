@@ -1,12 +1,15 @@
 "use server";
 
+import { cookies } from "next/headers";
 import * as ScoresRepository from "@/repositories/scores";
 import * as SongsRepository from "@/repositories/songs";
 
-const PLAYER_ID = "316bd1b0-f06f-4526-b316-d4d50fa6c056"; // InfaMc
-
 export const fetchLatestScoreMetadata = async () => {
-  return ScoresRepository.findLatestForPlayer(PLAYER_ID);
+  const cookieStore = await cookies();
+  const activePlayerId = cookieStore.get("active-player")?.value;
+  if (!activePlayerId) return null;
+
+  return ScoresRepository.findLatestForPlayer(activePlayerId);
 };
 
 export const fetchSongId = async (

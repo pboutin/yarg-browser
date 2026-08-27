@@ -40,13 +40,17 @@ export const findLatestForPlayer = async (
     },
   });
 
+  if (!score || !score.gameRecord?.songChecksum || score.instrument == null || score.difficulty == null) {
+    return null;
+  }
+
   return {
     playerId,
-    songChecksum: Buffer.from(score!.gameRecord!.songChecksum!)
+    songChecksum: Buffer.from(score.gameRecord.songChecksum)
       .toString("hex")
       .toUpperCase(),
-    instrument: score!.instrument as Instrument,
-    difficulty: score!.difficulty as Difficulty,
+    instrument: score.instrument as Instrument,
+    difficulty: score.difficulty as Difficulty,
   };
 };
 

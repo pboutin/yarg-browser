@@ -1,6 +1,8 @@
 import { Song as PrismaSong } from "@/generated/prisma/client";
+import { Player as PrismaPlayer } from "@/generated/prisma-scores/client";
 
 export type Song = PrismaSong;
+export type Player = PrismaPlayer;
 
 export enum Difficulty {
   Beginner = 0,

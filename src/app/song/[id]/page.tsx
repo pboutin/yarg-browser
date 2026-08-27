@@ -2,6 +2,7 @@ import SongScreen from "@/screens/song";
 import * as SongsRepository from "@/repositories/songs";
 import * as ScoresRepository from "@/repositories/scores";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { Difficulty, Instrument } from "@/types";
 
 type RawSearchParams = Promise<{ instrument: string; difficulty: string }>;
@@ -25,6 +26,13 @@ const parseSearchParams = async (
 };
 
 const SongPage = async ({ params, searchParams }: Props) => {
+  const cookieStore = await cookies();
+  const activePlayerId = cookieStore.get("active-player")?.value;
+
+  if (!activePlayerId) {
+    notFound();
+  }
+
   const { id } = await params;
   const { instrument: instrumentParam, difficulty: difficultyParam } =
     await parseSearchParams(searchParams);
@@ -36,7 +44,7 @@ const SongPage = async ({ params, searchParams }: Props) => {
   }
 
   const latestScore = await ScoresRepository.findLatestForPlayer(
-    "316bd1b0-f06f-4526-b316-d4d50fa6c056", // InfaMc
+    activePlayerId,
     song.checksum,
   );
 
@@ -45,14 +53,14 @@ const SongPage = async ({ params, searchParams }: Props) => {
   }
 
   const playedInstruments = await ScoresRepository.playedInstrumentsForSong(
-    "316bd1b0-f06f-4526-b316-d4d50fa6c056", // InfaMc
+    activePlayerId,
     song.checksum,
   );
 
   const activeInstrument = instrumentParam ?? latestScore.instrument;
 
   const playedDifficulties = await ScoresRepository.playedDifficultiesForSong(
-    "316bd1b0-f06f-4526-b316-d4d50fa6c056", // InfaMc
+    activePlayerId,
     song.checksum,
     activeInstrument,
   );
@@ -61,7 +69,7 @@ const SongPage = async ({ params, searchParams }: Props) => {
     difficultyParam ?? playedDifficulties[playedDifficulties.length - 1];
 
   const scores = await ScoresRepository.findAll(
-    "316bd1b0-f06f-4526-b316-d4d50fa6c056", // InfaMc
+    activePlayerId,
     song.checksum,
     activeInstrument,
     activeDifficulty,
