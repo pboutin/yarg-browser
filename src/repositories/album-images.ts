@@ -1,20 +1,36 @@
 import { resolveEnv } from "@/utilities/environment";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 
-const POSSIBLE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
+const EXTENSION_MIME_TYPES: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+};
 
-export const fetch = async (songDirectory: string) => {
-  for (const extension of POSSIBLE_EXTENSIONS) {
-    const imagePath = path.join(
-      resolveEnv("SONGS_PATH"),
-      songDirectory,
-      `album${extension}`,
-    );
-    if (fs.existsSync(imagePath)) {
-      return fs.readFileSync(imagePath).toString("base64");
+export interface AlbumImageFile {
+  filePath: string;
+  mimeType: string;
+}
+
+export const getAlbumImagePath = async (
+  songDirectory: string,
+): Promise<AlbumImageFile | null> => {
+  const songsBase = resolveEnv("SONGS_PATH");
+  const safeDirectory = path
+    .normalize(songDirectory)
+    .replace(/^(\.\.(\/|\\|$))+/, "");
+
+  for (const [extension, mimeType] of Object.entries(EXTENSION_MIME_TYPES)) {
+    const filePath = path.join(songsBase, safeDirectory, `album${extension}`);
+    try {
+      await fs.access(filePath);
+      return { filePath, mimeType };
+    } catch (error) {
+      console.warn("Error fetching album image: ", songDirectory, error);
+      // Image with this extension does not exist, check the next one
     }
   }
 
-  throw new Error(`Album image not found for ${songDirectory}`);
+  return null;
 };

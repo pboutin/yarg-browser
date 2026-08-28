@@ -3,21 +3,17 @@
 import CharterIcon from "@/components/charter-icon";
 import { Song } from "@/generated/prisma/client";
 import formatDuration from "@/utilities/format-duration";
-import { useEffect, useMemo, useState } from "react";
-import { fetchAlbumImage } from "./actions";
+import { useMemo, useState } from "react";
 import { Instrument } from "@/types";
 import Instruments from "@/components/instruments";
+import { getSongAlbumImageUrl } from "@/utilities/songs";
 
 interface Props {
   song: Song;
 }
 
 const SongSidePanel = ({ song }: Props) => {
-  const [albumImage, setAlbumImage] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchAlbumImage(song.directory).then(setAlbumImage);
-  }, [song.directory]);
+  const [hasImageError, setHasImageError] = useState<boolean>(false);
 
   const instruments = useMemo(() => {
     return JSON.parse(song.instrumentsJson) as Instrument[];
@@ -27,12 +23,14 @@ const SongSidePanel = ({ song }: Props) => {
     <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto">
       <div className="bg-background flex flex-col gap-4">
         <div className="relative">
-          {albumImage ? (
+          {!hasImageError ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={`data:image/jpeg;base64,${albumImage}`}
+              key={song.id}
+              src={getSongAlbumImageUrl(song.id)}
               alt={song.album ?? "album artwork"}
               className="w-full"
+              onError={() => setHasImageError(true)}
             />
           ) : null}
 
