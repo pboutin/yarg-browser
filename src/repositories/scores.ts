@@ -176,7 +176,6 @@ export const masteredInstrumentsForSongs = async (
       difficulty: { gte: Difficulty.Expert },
       isFc: { equals: 1 },
     },
-    distinct: ["instrument"],
     include: {
       gameRecord: true,
     },
@@ -184,14 +183,20 @@ export const masteredInstrumentsForSongs = async (
 
   return songChecksums.map((songChecksum) => {
     const scoreSongChecksum = Buffer.from(songChecksum, "hex");
-    return scores
-      .filter(
-        (score) =>
-          score.gameRecord?.songChecksum &&
-          Buffer.compare(score.gameRecord?.songChecksum, scoreSongChecksum) ===
-            0,
-      )
-      .map<Instrument>((score) => score.instrument!)
-      .sort();
+
+    return Array.from(
+      new Set(
+        scores
+          .filter(
+            (score) =>
+              score.gameRecord?.songChecksum &&
+              Buffer.compare(
+                score.gameRecord?.songChecksum,
+                scoreSongChecksum,
+              ) === 0,
+          )
+          .map<Instrument>((score) => score.instrument!),
+      ),
+    ).sort();
   });
 };
