@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import { getCharter, Charter } from "@/repositories/charters";
+import {
+  getCharter,
+  Charter,
+  getDefaultCharter,
+} from "@/repositories/charters";
 import Image from "next/image";
 
 interface Props {
@@ -20,6 +24,12 @@ const CharterIcon = ({ charterId, size, className }: Props) => {
     return null;
   }
 
+  const handleError = () => {
+    getDefaultCharter().then((charter) => {
+      setCharter(charter);
+    });
+  };
+
   return (
     <Image
       src={charter.iconUrl}
@@ -27,6 +37,7 @@ const CharterIcon = ({ charterId, size, className }: Props) => {
       width={size}
       height={size}
       className={className}
+      onError={handleError}
     />
   );
 };

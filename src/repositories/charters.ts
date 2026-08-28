@@ -25,7 +25,7 @@ const chartersMap = new Map<string, Charter>();
 
 const loadCharters = async () => {
   const baseIndexFile = await fetch(BASE_INDEX_FILE_URL).then((res) =>
-    res.json()
+    res.json(),
   );
 
   baseIndexFile.sources.forEach((source: YarcCharter & { ids: string[] }) => {
@@ -39,7 +39,7 @@ const loadCharters = async () => {
   });
 
   const extraIndexFile = await fetch(EXTRA_INDEX_FILE_URL).then((res) =>
-    res.json()
+    res.json(),
   );
 
   extraIndexFile.sources.forEach((source: YarcCharter & { ids: string[] }) => {
@@ -67,4 +67,12 @@ export const getCharter = async (id: string | null) => {
   }
 
   return charter;
+};
+
+export const getDefaultCharter = async () => {
+  if (chartersMap.size === 0) {
+    await loadCharters();
+  }
+
+  return chartersMap.get(DEFAULT_CHARTER_ID)!;
 };
