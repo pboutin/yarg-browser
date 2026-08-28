@@ -4,13 +4,23 @@ import Image from "next/image";
 
 interface Props {
   instruments: Instrument[];
+  variant?: "regular" | "fc";
+  size?: number;
+  className?: string;
   active?: Instrument;
   onClick?: (instrument: Instrument) => void;
 }
 
-const Instruments = ({ instruments, active, onClick }: Props) => {
+const Instruments = ({
+  instruments,
+  variant = "regular",
+  size = 60,
+  className,
+  active,
+  onClick,
+}: Props) => {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className={classNames("flex flex-wrap items-center gap-2", className)}>
       {instruments.map((instrument) => (
         <Image
           onClick={() => onClick?.(instrument)}
@@ -18,10 +28,12 @@ const Instruments = ({ instruments, active, onClick }: Props) => {
             "border-4 border-primary": active === instrument,
           })}
           key={instrument}
-          src={`/instruments/${instrument}.png`}
+          src={`/instruments/${instrument}.${
+            variant === "fc" ? "fc.png" : "png"
+          }`}
           alt={instrument.toString()}
-          width={60}
-          height={60}
+          width={size}
+          height={size}
         />
       ))}
     </div>

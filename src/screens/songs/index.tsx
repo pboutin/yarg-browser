@@ -11,13 +11,14 @@ import ShareButton from "@/components/share-button";
 import { Song } from "@/generated/prisma/client";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
-import { search } from "./actions";
+import { search, SearchResult } from "./actions";
+import Instruments from "@/components/instruments";
 
 const SongsScreen = () => {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
-  const [songs, setSongs] = useState<Song[]>([]);
+  const [songs, setSongs] = useState<SearchResult["songs"]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(false);
 
@@ -115,7 +116,7 @@ const SongsScreen = () => {
 
                     <div
                       className={classNames(
-                        "flex items-center gap-4 py-2 px-4 rounded cursor-pointer border-y-1 border-layout-dark hover:bg-layout-dark",
+                        "flex items-center gap-4 px-4 h-14 rounded cursor-pointer border-y border-layout-dark hover:bg-layout-dark",
                         {
                           "bg-layout-light": song.id === selectedSong?.id,
                         },
@@ -135,6 +136,7 @@ const SongsScreen = () => {
                       >
                         {song.name}
                       </div>
+
                       <div
                         className={classNames(
                           "text-md italic flex-1",
@@ -145,6 +147,13 @@ const SongsScreen = () => {
                       >
                         {song.artist}
                       </div>
+
+                      <Instruments
+                        instruments={song.masteredInstruments}
+                        variant="fc"
+                        size={40}
+                        className="flex-1 justify-end max-w-[300]"
+                      />
                     </div>
                   </div>
                 );

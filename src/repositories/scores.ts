@@ -40,7 +40,12 @@ export const findLatestForPlayer = async (
     },
   });
 
-  if (!score || !score.gameRecord?.songChecksum || score.instrument == null || score.difficulty == null) {
+  if (
+    !score ||
+    !score.gameRecord?.songChecksum ||
+    score.instrument == null ||
+    score.difficulty == null
+  ) {
     return null;
   }
 
@@ -153,4 +158,40 @@ export const playedDifficultiesForSong = async (
   )
     .filter((difficulty) => difficulty !== null)
     .sort();
+};
+
+export const masteredInstrumentsForSongs = async (
+  playerId: string,
+  songChecksums: string[],
+): Promise<Array<Instrument[]>> => {
+  const scores = await prismaScoresClient.playerScore.findMany({
+    where: {
+      playerId,
+      gameRecord: {
+        songChecksum: {
+          in: songChecksums.map((checksum) => Buffer.from(checksum, "hex")),
+        },
+      },
+      instrument: { not: null },
+      difficulty: { gte: Difficulty.Expert },
+      isFc: { equals: 1 },
+    },
+    distinct: ["instrument"],
+    include: {
+      gameRecord: true,
+    },
+  });
+
+  return songChecksums.map((songChecksum) => {
+    const scoreSongChecksum = Buffer.from(songChecksum, "hex");
+    return scores
+      .filter(
+        (score) =>
+          score.gameRecord?.songChecksum &&
+          Buffer.compare(score.gameRecord?.songChecksum, scoreSongChecksum) ===
+            0,
+      )
+      .map<Instrument>((score) => score.instrument!)
+      .sort();
+  });
 };
