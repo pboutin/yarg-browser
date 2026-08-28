@@ -6,7 +6,6 @@ import formatDuration from "@/utilities/format-duration";
 import { useEffect, useMemo, useState } from "react";
 import { fetchAlbumImage } from "./actions";
 import { Instrument } from "@/types";
-import Image from "next/image";
 import Instruments from "@/components/instruments";
 
 interface Props {
@@ -27,22 +26,24 @@ const SongSidePanel = ({ song }: Props) => {
   return (
     <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto">
       <div className="bg-background flex flex-col gap-4">
-        {albumImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={`data:image/jpeg;base64,${albumImage}`}
-            alt={song.album ?? "album artwork"}
-            className="w-full"
-          />
-        ) : null}
+        <div className="relative">
+          {albumImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`data:image/jpeg;base64,${albumImage}`}
+              alt={song.album ?? "album artwork"}
+              className="w-full"
+            />
+          ) : null}
 
-        <div className="flex flex-col gap-1 px-4">
-          <div className="text-white text-3xl font-bold">{song.name}</div>
-          <div className="text-primary text-xl font-semibold">
-            {song.artist}
-          </div>
-          <div className="text-secondary text-lg font-semibold">
-            {song.album}
+          <div className="flex flex-col gap-1 px-4 pt-12 absolute bottom-0 left-0 right-0 bg-linear-to-b from-background/0 via-background/60 via-40% to-background">
+            <div className="text-white text-3xl font-bold">{song.name}</div>
+            <div className="text-primary text-xl font-semibold">
+              {song.artist}
+            </div>
+            <div className="text-secondary text-lg font-semibold">
+              {song.album}
+            </div>
           </div>
         </div>
 
