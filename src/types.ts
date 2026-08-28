@@ -1,8 +1,11 @@
 import { Song as PrismaSong } from "@/generated/prisma/client";
 import { Player as PrismaPlayer } from "@/generated/prisma-scores/client";
 
-export type Song = PrismaSong;
 export type Player = PrismaPlayer;
+
+export interface Song extends Omit<PrismaSong, "instrumentsJson"> {
+  instruments: Instrument[];
+}
 
 export enum Difficulty {
   Beginner = 0,

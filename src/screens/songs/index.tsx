@@ -8,11 +8,13 @@ import SongSidePanel from "@/components/song-side-panel";
 import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ShareButton from "@/components/share-button";
-import { Song } from "@/generated/prisma/client";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import { search, SearchResult } from "./actions";
 import Instruments from "@/components/instruments";
+import InstrumentsDropdown from "@/components/instruments-dropdown";
+import useLocalStorageState from "@/hooks/use-local-storage-state";
+import { Instrument, Song } from "@/types";
 
 const SongsScreen = () => {
   const router = useRouter();
@@ -23,6 +25,10 @@ const SongsScreen = () => {
   const [hasMore, setHasMore] = useState(false);
 
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+
+  const [displayedInstruments, setDisplayedInstruments] = useLocalStorageState<
+    Instrument[]
+  >("displayed-instruments", []);
 
   const debouncedQuery = useDebouncedValue(query, 1000);
 
@@ -87,6 +93,14 @@ const SongsScreen = () => {
                   onChange={(e) => setQuery(e.target.value)}
                 />
               </div>
+
+              <InstrumentsDropdown
+                blankLabel="All"
+                label="Displayed Instruments"
+                selectedInstruments={displayedInstruments}
+                onChange={setDisplayedInstruments}
+              />
+
               <div className="">
                 {total ? <SongCount count={total} /> : null}
               </div>
@@ -149,8 +163,9 @@ const SongsScreen = () => {
                       </div>
 
                       <Instruments
-                        instruments={song.masteredInstruments}
-                        variant="fc"
+                        instruments={song.instruments}
+                        filteredInstruments={displayedInstruments}
+                        masteredInstruments={song.masteredInstruments}
                         size={40}
                         className="flex-1 justify-end max-w-[300]"
                       />

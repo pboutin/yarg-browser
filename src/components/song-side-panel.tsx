@@ -1,10 +1,9 @@
 "use client";
 
 import CharterIcon from "@/components/charter-icon";
-import { Song } from "@/generated/prisma/client";
 import formatDuration from "@/utilities/format-duration";
-import { useMemo, useState } from "react";
-import { Instrument } from "@/types";
+import { useState } from "react";
+import { Song } from "@/types";
 import Instruments from "@/components/instruments";
 import { getSongAlbumImageUrl } from "@/utilities/songs";
 
@@ -14,10 +13,6 @@ interface Props {
 
 const SongSidePanel = ({ song }: Props) => {
   const [hasImageError, setHasImageError] = useState<boolean>(false);
-
-  const instruments = useMemo(() => {
-    return JSON.parse(song.instrumentsJson) as Instrument[];
-  }, [song.instrumentsJson]);
 
   return (
     <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto">
@@ -69,7 +64,7 @@ const SongSidePanel = ({ song }: Props) => {
             <div className="text-gray-400 font-semibold text-sm mb-2">
               CHARTED FOR
             </div>
-            <Instruments instruments={instruments} />
+            <Instruments instruments={song.instruments} />
           </div>
         </div>
       </div>

@@ -56,7 +56,7 @@ const LiveScoresToggle = () => {
 
   return (
     <label className="label cursor-pointer gap-2 fade-in">
-      <span className="label-text">Live Scores</span>
+      <span className=" text-gray-400 text-sm font-semibold">Live Scores</span>
       <input
         type="checkbox"
         className="toggle toggle-accent"

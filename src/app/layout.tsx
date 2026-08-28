@@ -4,8 +4,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import "./globals.css";
 import LiveScoresToggle from "@/components/live-scores-toggle/index";
-import PlayerDropdown from "@/components/player-dropdown/index";
 import * as PlayersRepository from "@/repositories/players";
+import ActivePlayerSelector from "@/components/active-player-selector/index";
 
 const interFont = Inter({
   variable: "--font-inter",
@@ -39,7 +39,7 @@ export default async function RootLayout({
             Library
           </Link>
           <div className="ml-auto flex items-center gap-4">
-            <PlayerDropdown
+            <ActivePlayerSelector
               players={players}
               activePlayerId={activePlayerId}
             />

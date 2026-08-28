@@ -44,7 +44,7 @@ if (!SONGS_DIRECTORY) {
       charterId: songIniContent.icon,
       length: parseInt(songIniContent.song_length),
       checksum,
-      instrumentsJson: JSON.stringify(instruments),
+      instruments,
     };
 
     await SongsRepository.upsert(song);

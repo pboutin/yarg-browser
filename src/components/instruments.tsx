@@ -1,10 +1,12 @@
 import { Instrument } from "@/types";
 import classNames from "classnames";
 import Image from "next/image";
+import { useMemo } from "react";
 
 interface Props {
   instruments: Instrument[];
-  variant?: "regular" | "fc";
+  filteredInstruments?: Instrument[];
+  masteredInstruments?: Instrument[];
   size?: number;
   className?: string;
   active?: Instrument;
@@ -13,15 +15,24 @@ interface Props {
 
 const Instruments = ({
   instruments,
-  variant = "regular",
+  filteredInstruments,
+  masteredInstruments = [],
   size = 60,
   className,
   active,
   onClick,
 }: Props) => {
+  const displayedInstruments = useMemo(() => {
+    if (!filteredInstruments) return instruments;
+
+    return instruments.filter((instrument) =>
+      filteredInstruments.includes(instrument),
+    );
+  }, [instruments, filteredInstruments]);
+
   return (
     <div className={classNames("flex flex-wrap items-center gap-2", className)}>
-      {instruments.map((instrument) => (
+      {displayedInstruments.map((instrument) => (
         <Image
           onClick={() => onClick?.(instrument)}
           className={classNames("cursor-pointer rounded-full", {
@@ -29,7 +40,7 @@ const Instruments = ({
           })}
           key={instrument}
           src={`/instruments/${instrument}.${
-            variant === "fc" ? "fc.png" : "png"
+            masteredInstruments.includes(instrument) ? "fc.png" : "png"
           }`}
           alt={instrument.toString()}
           width={size}

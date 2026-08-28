@@ -1,28 +1,22 @@
 "use client";
 
-import { useTransition } from "react";
 import { Player } from "@/types";
-import { setActivePlayer } from "./actions";
 
 interface Props {
   players: Player[];
-  activePlayerId?: string;
+  selectedPlayerId?: string;
+  onChange: (playerId: string) => void;
 }
 
-const PlayerDropdown = ({ players, activePlayerId }: Props) => {
-  const [, startTransition] = useTransition();
-
-  const activePlayer = players.find((p) => p.id === activePlayerId);
+const PlayerDropdown = ({ players, selectedPlayerId, onChange }: Props) => {
+  const selectedPlayer = players.find((p) => p.id === selectedPlayerId);
 
   const handleSelect = (playerId: string) => {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
 
-    startTransition(async () => {
-      await setActivePlayer(playerId);
-      window.location.reload();
-    });
+    onChange(playerId);
   };
 
   return (
@@ -30,7 +24,7 @@ const PlayerDropdown = ({ players, activePlayerId }: Props) => {
       <div tabIndex={0} role="button" className="btn btn-ghost gap-2">
         <span className="text-gray-400 text-sm">Player:</span>
         <span className="font-semibold text-primary">
-          {activePlayer?.name ?? "Select Player"}
+          {selectedPlayer?.name ?? "Select Player"}
         </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +42,7 @@ const PlayerDropdown = ({ players, activePlayerId }: Props) => {
           <li className="px-2 py-1 text-sm text-gray-400">No players found</li>
         ) : (
           players.map((player) => {
-            const isSelected = player.id === activePlayerId;
+            const isSelected = player.id === selectedPlayerId;
             return (
               <li key={player.id}>
                 <button
