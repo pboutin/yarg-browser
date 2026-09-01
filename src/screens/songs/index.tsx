@@ -12,9 +12,8 @@ import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import { search, SearchResult } from "./actions";
 import Instruments from "@/components/instruments";
-import InstrumentsDropdown from "@/components/instruments-dropdown";
-import useLocalStorageState from "@/hooks/use-local-storage-state";
-import { Instrument, Song } from "@/types";
+import { Song } from "@/types";
+import { formatDistanceToNow } from "date-fns";
 
 const SongsScreen = () => {
   const router = useRouter();
@@ -25,10 +24,6 @@ const SongsScreen = () => {
   const [hasMore, setHasMore] = useState(false);
 
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
-
-  const [displayedInstruments, setDisplayedInstruments] = useLocalStorageState<
-    Instrument[]
-  >("displayed-instruments", []);
 
   const debouncedQuery = useDebouncedValue(query, 1000);
 
@@ -94,13 +89,6 @@ const SongsScreen = () => {
                 />
               </div>
 
-              <InstrumentsDropdown
-                blankLabel="All"
-                label="Displayed Instruments"
-                selectedInstruments={displayedInstruments}
-                onChange={setDisplayedInstruments}
-              />
-
               <div className="">
                 {total ? <SongCount count={total} /> : null}
               </div>
@@ -140,34 +128,51 @@ const SongsScreen = () => {
                     >
                       <CharterIcon charterId={song.charterId} size={32} />
 
-                      <div
-                        className={classNames(
-                          "text-xl flex-1",
-                          song.id === selectedSong?.id
-                            ? "text-white font-bold"
-                            : "text-primary",
-                        )}
-                      >
-                        {song.name}
+                      <div className="flex-1 flex items-center">
+                        <span
+                          className={classNames(
+                            "text-xl",
+                            song.id === selectedSong?.id
+                              ? "text-white font-bold"
+                              : "text-primary",
+                          )}
+                        >
+                          {song.name}
+                        </span>
+                        {song.album ? (
+                          <span
+                            className={classNames(
+                              "text-md ml-2",
+                              song.id === selectedSong?.id
+                                ? "text-white font-bold"
+                                : "text-secondary",
+                            )}
+                          >
+                            {song.album}
+                          </span>
+                        ) : null}
                       </div>
 
                       <div
                         className={classNames(
-                          "text-md italic flex-1",
+                          "text-sm italic flex-1 font-semibold",
                           song.id === selectedSong?.id
                             ? "text-white font-bold"
                             : "text-secondary",
                         )}
                       >
-                        {song.artist}
+                        {song.latestPlayedAt
+                          ? formatDistanceToNow(song.latestPlayedAt, {
+                              addSuffix: true,
+                            })
+                          : null}
                       </div>
 
                       <Instruments
                         instruments={song.instruments}
-                        filteredInstruments={displayedInstruments}
-                        masteredInstruments={song.masteredInstruments}
-                        size={40}
-                        className="flex-1 justify-end max-w-[300]"
+                        instrumentPersonalBests={song.personalBests}
+                        size={42}
+                        className="flex-1 justify-end "
                       />
                     </div>
                   </div>

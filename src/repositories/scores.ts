@@ -160,43 +160,106 @@ export const playedDifficultiesForSong = async (
     .sort();
 };
 
-export const masteredInstrumentsForSongs = async (
+export const personalBestsByInstrumentsForSong = async (
   playerId: string,
   songChecksums: string[],
-): Promise<Array<Instrument[]>> => {
-  const scores = await prismaScoresClient.playerScore.findMany({
+): Promise<
+  Array<
+    Array<{
+      instrument: Instrument;
+      difficulty: Difficulty;
+      stars: number;
+      isFc: boolean;
+    }>
+  >
+> => {
+  const personalBests = await Promise.all(
+    songChecksums.map((songChecksum) =>
+      prismaScoresClient.playerScore.groupBy({
+        by: ["instrument", "difficulty"],
+        where: {
+          playerId,
+          instrument: { not: null },
+          difficulty: { not: null },
+          gameRecord: {
+            songChecksum: Buffer.from(songChecksum, "hex"),
+          },
+        },
+        _max: {
+          stars: true,
+          isFc: true,
+        },
+      }),
+    ),
+  );
+
+  return songChecksums.map((_checksum, index) => {
+    const bestsPerInstruments = personalBests[index].reduce(
+      (acc, personalBest) => {
+        const previousMatch = acc[personalBest.instrument!] ?? null;
+        return {
+          ...acc,
+          [personalBest.instrument!]: {
+            difficulty: Math.max(
+              previousMatch?.difficulty ?? 0,
+              personalBest.difficulty!,
+            ) as Difficulty,
+            stars: Math.max(
+              previousMatch?.stars ?? 0,
+              personalBest._max.stars!,
+            ),
+            isFc: previousMatch?.isFc || !!personalBest._max.isFc!,
+          },
+        };
+      },
+      {} as Record<
+        number,
+        { difficulty: Difficulty; stars: number; isFc: boolean }
+      >,
+    );
+
+    return Object.entries(bestsPerInstruments)
+      .map(([instrument, best]) => ({
+        instrument: Number(instrument) as Instrument,
+        difficulty: best.difficulty,
+        stars: best.stars,
+        isFc: best.isFc,
+      }))
+      .sort((a, b) => a.instrument - b.instrument);
+  });
+};
+
+export const latestPlayedAtForSongs = async (
+  playerId: string,
+  songChecksums: string[],
+): Promise<Array<Date | null>> => {
+  const gameRecords = await prismaScoresClient.gameRecord.groupBy({
+    by: ["songChecksum"],
     where: {
-      playerId,
-      gameRecord: {
-        songChecksum: {
-          in: songChecksums.map((checksum) => Buffer.from(checksum, "hex")),
+      songChecksum: {
+        in: songChecksums.map((checksum) => Buffer.from(checksum, "hex")),
+      },
+      playerScores: {
+        some: {
+          playerId,
         },
       },
-      instrument: { not: null },
-      difficulty: { gte: Difficulty.Expert },
-      isFc: { equals: 1 },
+      date: { not: null },
     },
-    include: {
-      gameRecord: true,
+    _max: {
+      date: true,
     },
   });
 
-  return songChecksums.map((songChecksum) => {
-    const scoreSongChecksum = Buffer.from(songChecksum, "hex");
-
-    return Array.from(
-      new Set(
-        scores
-          .filter(
-            (score) =>
-              score.gameRecord?.songChecksum &&
-              Buffer.compare(
-                score.gameRecord?.songChecksum,
-                scoreSongChecksum,
-              ) === 0,
-          )
-          .map<Instrument>((score) => score.instrument!),
-      ),
-    ).sort();
+  return songChecksums.map((checksum) => {
+    const gameRecordSongChecksum = Buffer.from(checksum, "hex");
+    const latestGameRecord = gameRecords.find(
+      (gameRecord) =>
+        gameRecord.songChecksum &&
+        Buffer.compare(gameRecord.songChecksum, gameRecordSongChecksum) === 0,
+    );
+    return latestGameRecord?._max?.date
+      ? ticksToDate(latestGameRecord._max.date)
+      : null;
   });
 };

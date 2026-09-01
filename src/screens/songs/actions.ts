@@ -13,19 +13,31 @@ export const search = async (searchQuery: SearchQuery, skip?: number) => {
 
   const searchResult = await SongsRepository.search(searchQuery, skip);
 
-  const masteredInstruments = activePlayerId
-    ? await ScoresRepository.masteredInstrumentsForSongs(
+  const songChecksums = searchResult.songs.map((song) => song.checksum);
+
+  const personalBests = activePlayerId
+    ? await ScoresRepository.personalBestsByInstrumentsForSong(
         activePlayerId,
-        searchResult.songs.map((song) => song.checksum),
+        songChecksums,
+      )
+    : [];
+
+  const latestPlayedAt = activePlayerId
+    ? await ScoresRepository.latestPlayedAtForSongs(
+        activePlayerId,
+        songChecksums,
       )
     : [];
 
   return {
     ...searchResult,
-    songs: searchResult.songs.map((song, index) => ({
-      ...song,
-      masteredInstruments: masteredInstruments[index],
-    })),
+    songs: searchResult.songs.map((song, index) => {
+      return {
+        ...song,
+        personalBests: personalBests[index],
+        latestPlayedAt: latestPlayedAt[index],
+      };
+    }),
   };
 };
 

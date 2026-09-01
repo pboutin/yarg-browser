@@ -58,6 +58,10 @@
   animation: fade-in 0.3s ease-in-out;
 }
 
+.gold-to-primary-hue-rotate {
+  filter: hue-rotate(149deg);
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
