@@ -173,57 +173,52 @@ export const personalBestsByInstrumentsForSong = async (
     }>
   >
 > => {
-  const personalBests = await Promise.all(
-    songChecksums.map((songChecksum) =>
-      prismaScoresClient.playerScore.groupBy({
-        by: ["instrument", "difficulty"],
-        where: {
-          playerId,
-          instrument: { not: null },
-          difficulty: { not: null },
-          gameRecord: {
-            songChecksum: Buffer.from(songChecksum, "hex"),
-          },
-        },
-        _max: {
-          stars: true,
-          isFc: true,
-        },
-      }),
+  const personalBests = (await Promise.all(
+    songChecksums.map(
+      (songChecksum) =>
+        prismaScoresClient.$queryRaw`
+      SELECT max(ps.Score), ps.Instrument, ps.Difficulty, ps.Stars, ps.IsFc
+      FROM PlayerScores ps
+      INNER JOIN GameRecords gr ON ps.GameRecordId = gr.Id
+      WHERE gr.SongChecksum = ${Buffer.from(songChecksum, "hex")}
+      AND ps.PlayerId = ${playerId}
+      GROUP BY ps.Instrument, ps.Difficulty;
+    `,
     ),
-  );
+  )) as Array<
+    Array<{
+      Instrument: Instrument;
+      Difficulty: Difficulty;
+      Stars: number;
+      IsFc: boolean;
+    }>
+  >;
 
   return songChecksums.map((_checksum, index) => {
     const bestsPerInstruments = personalBests[index].reduce(
-      (acc, personalBest) => {
-        const previousMatch = acc[personalBest.instrument!] ?? null;
+      (acc, currentPersonalBest) => {
+        const previousMatch = acc[currentPersonalBest.Instrument] ?? null;
         return {
           ...acc,
-          [personalBest.instrument!]: {
-            difficulty: Math.max(
-              previousMatch?.difficulty ?? 0,
-              personalBest.difficulty!,
-            ) as Difficulty,
-            stars: Math.max(
-              previousMatch?.stars ?? 0,
-              personalBest._max.stars!,
-            ),
-            isFc: previousMatch?.isFc || !!personalBest._max.isFc!,
-          },
+          [currentPersonalBest.Instrument]:
+            !previousMatch ||
+            previousMatch.Difficulty < currentPersonalBest.Difficulty
+              ? currentPersonalBest
+              : previousMatch,
         };
       },
       {} as Record<
-        number,
-        { difficulty: Difficulty; stars: number; isFc: boolean }
+        Instrument,
+        { Difficulty: Difficulty; Stars: number; IsFc: boolean }
       >,
     );
 
     return Object.entries(bestsPerInstruments)
       .map(([instrument, best]) => ({
         instrument: Number(instrument) as Instrument,
-        difficulty: best.difficulty,
-        stars: best.stars,
-        isFc: best.isFc,
+        difficulty: best.Difficulty,
+        stars: best.Stars,
+        isFc: best.IsFc,
       }))
       .sort((a, b) => a.instrument - b.instrument);
   });
