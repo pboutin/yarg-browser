@@ -77,6 +77,8 @@ const Instruments = ({
                 }.png`}
                 className={classNames("-ml-2", {
                   "gold-to-primary-hue-rotate": personalBest.isFc,
+                  "opacity-60": personalBest.stars === 4,
+                  "opacity-20": personalBest.stars <= 3,
                 })}
                 alt={personalBest.stars.toString()}
                 width={size * PERSONAL_BEST_DISPLAY_RATIO}
