@@ -5,7 +5,7 @@ import SongCount from "@/components/song-count";
 import useDebouncedValue from "@/hooks/use-debounced-value";
 import ArtistHeader from "@/screens/songs/artist-header";
 import SongSidePanel from "@/components/song-side-panel";
-import { useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ShareButton from "@/components/share-button";
 import classNames from "classnames";
@@ -14,16 +14,32 @@ import { search, SearchResult } from "./actions";
 import Instruments from "@/components/instruments";
 import { Song } from "@/types";
 import { formatDistanceToNow } from "date-fns";
+import { getSongsListCache, setSongsListCache } from "./list-cache";
 
 const SongsScreen = () => {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const [cached] = useState(() => getSongsListCache());
+  const shouldRestore = cached !== null && cached.songs.length > 0;
 
-  const [songs, setSongs] = useState<SearchResult["songs"]>([]);
-  const [total, setTotal] = useState<number | null>(null);
-  const [hasMore, setHasMore] = useState(false);
+  const [query, setQuery] = useState(shouldRestore ? cached.query : "");
+  const [songs, setSongs] = useState<SearchResult["songs"]>(() =>
+    shouldRestore ? cached.songs : [],
+  );
+  const [total, setTotal] = useState<number | null>(
+    shouldRestore ? cached.total : null,
+  );
+  const [hasMore, setHasMore] = useState(
+    shouldRestore ? cached.hasMore : false,
+  );
+  const [selectedSong, setSelectedSong] = useState<Song | null>(() => {
+    if (!shouldRestore || !cached.selectedSongId) return null;
+    return (
+      cached.songs.find((song) => song.id === cached.selectedSongId) ?? null
+    );
+  });
 
-  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const pendingScrollTopRef = useRef<number>(0);
+  const disabledSearchRef = useRef(shouldRestore);
 
   const debouncedQuery = useDebouncedValue(query, 1000);
 
@@ -42,6 +58,8 @@ const SongsScreen = () => {
   }
 
   useEffect(() => {
+    if (disabledSearchRef.current) return;
+
     document.getElementById("songs-scroll")?.scrollTo(0, 0);
     let cancelled = false;
 
@@ -64,8 +82,27 @@ const SongsScreen = () => {
     });
   };
 
+  const handleScroll = (event: UIEvent) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    pendingScrollTopRef.current = target.scrollTop;
+  };
+
   const handleNavigatingToSong = (song: Song) => {
+    setSongsListCache({
+      query,
+      songs,
+      hasMore,
+      total,
+      selectedSongId: song.id,
+      scrollTop: pendingScrollTopRef.current,
+    });
     router.push(`/song/${song.id}`);
+  };
+
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    disabledSearchRef.current = false;
+    setQuery(event.target.value);
   };
 
   return (
@@ -85,7 +122,7 @@ const SongsScreen = () => {
                   type="text"
                   value={query}
                   className="input input-md w-full"
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={handleSearchChange}
                 />
               </div>
 
@@ -102,6 +139,8 @@ const SongsScreen = () => {
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
               scrollableTarget="songs-scroll"
+              initialScrollY={cached?.scrollTop ?? 0}
+              onScroll={handleScroll}
             >
               {songs.map((song, index) => {
                 const shouldRenderArtistHeader =
