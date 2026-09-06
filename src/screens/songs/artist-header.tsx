@@ -7,16 +7,22 @@ import { countForArtist } from "./actions";
 
 interface Props {
   artist: string;
+  deletedArtists: string[];
   searchQuery: SearchQuery;
   className?: string;
 }
 
-const ArtistHeader = ({ artist, searchQuery, className }: Props) => {
+const ArtistHeader = ({
+  artist,
+  deletedArtists,
+  searchQuery,
+  className,
+}: Props) => {
   const [songCount, setSongCount] = useState<number | null>(null);
 
   useEffect(() => {
     countForArtist(artist, searchQuery).then((count) => setSongCount(count));
-  }, [artist, searchQuery]);
+  }, [artist, searchQuery, deletedArtists]);
 
   return (
     <div

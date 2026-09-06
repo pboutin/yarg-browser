@@ -7,13 +7,15 @@ import { CompleteScore, Song } from "@/types";
 import Instruments from "@/components/instruments";
 import { getSongAlbumImageUrl } from "@/utilities/songs";
 import FixStarsButton from "@/components/fix-stars-button";
+import DeleteSongButton from "@/components/delete-song-button";
 
 interface Props {
   song: Song;
   scores?: CompleteScore[];
+  onDeleted?: (song: Song) => void;
 }
 
-const SongSidePanel = ({ song, scores }: Props) => {
+const SongSidePanel = ({ song, scores, onDeleted }: Props) => {
   const [hasImageError, setHasImageError] = useState<boolean>(false);
 
   return (
@@ -68,7 +70,12 @@ const SongSidePanel = ({ song, scores }: Props) => {
             </div>
             <Instruments instruments={song.instruments} />
           </div>
-          <div>{scores ? <FixStarsButton scores={scores} /> : null}</div>
+          <div className="mt-4 flex items-center gap-2">
+            {scores ? <FixStarsButton scores={scores} /> : null}
+            {onDeleted ? (
+              <DeleteSongButton song={song} onDeleted={onDeleted} />
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

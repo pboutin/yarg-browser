@@ -37,6 +37,7 @@ const SongsScreen = () => {
       cached.songs.find((song) => song.id === cached.selectedSongId) ?? null
     );
   });
+  const [deletedArtists, setDeletedArtists] = useState<string[]>([]);
 
   const pendingScrollTopRef = useRef<number>(0);
   const disabledSearchRef = useRef(shouldRestore);
@@ -105,6 +106,15 @@ const SongsScreen = () => {
     setQuery(event.target.value);
   };
 
+  const handleDeleted = (song: Song) => {
+    setSongs((prevSongs) => prevSongs.filter((s) => s.id !== song.id));
+    setSelectedSong(null);
+    setDeletedArtists((prevDeletedArtists) => [
+      ...prevDeletedArtists,
+      song.artist,
+    ]);
+  };
+
   return (
     <>
       <ShareButton />
@@ -150,6 +160,7 @@ const SongsScreen = () => {
                   <div key={song.id}>
                     {shouldRenderArtistHeader ? (
                       <ArtistHeader
+                        deletedArtists={deletedArtists}
                         artist={song.artist}
                         searchQuery={searchQuery}
                       />
@@ -221,7 +232,9 @@ const SongsScreen = () => {
           </div>
         </div>
 
-        {selectedSong ? <SongSidePanel song={selectedSong} /> : null}
+        {selectedSong ? (
+          <SongSidePanel song={selectedSong} onDeleted={handleDeleted} />
+        ) : null}
       </div>
     </>
   );

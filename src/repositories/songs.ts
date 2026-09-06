@@ -95,3 +95,9 @@ export const upsert = async (song: Omit<Song, "id">) => {
     create: data,
   });
 };
+
+export const destroy = async (songId: string) => {
+  await prismaClient.song.delete({
+    where: { id: songId },
+  });
+};
