@@ -1,22 +1,21 @@
-import dotenv from "dotenv";
-import fs from "fs";
-import readIniFile from "./utilities/read-ini-file";
+"use server";
 
-import { computeSongChecksum } from "./utilities/checksum";
-import { listChartedInstruments } from "./utilities/instruments";
+import fs from "fs";
 import { Song } from "@/types";
 import * as SongsRepository from "@/repositories/songs";
+import readIniFile from "@/lib/songs-scan/read-ini-file";
+import { computeSongChecksum } from "@/lib/songs-scan/checksum";
+import { listChartedInstruments } from "@/lib/songs-scan/instruments";
+import { resolveEnv } from "@/utilities/environment";
 
-dotenv.config();
+export default async function scanAllSongs() {
+  const SONGS_DIRECTORY = resolveEnv("SONGS_PATH");
 
-const SONGS_DIRECTORY = process.env.SONGS_PATH;
+  if (!SONGS_DIRECTORY) {
+    console.error("SONGS_PATH env is not set");
+    return;
+  }
 
-if (!SONGS_DIRECTORY) {
-  console.error("SONGS_PATH env is not set");
-  process.exit(1);
-}
-
-(async () => {
   console.time("Runtime");
   for (const songDirectory of fs.readdirSync(SONGS_DIRECTORY)) {
     const currentSongDirectory = `${SONGS_DIRECTORY}/${songDirectory}`;
@@ -55,5 +54,4 @@ if (!SONGS_DIRECTORY) {
   const totalSongs = await SongsRepository.countAll();
 
   console.log(`Donezo. Total songs: ${totalSongs}`);
-  process.exit(0);
-})();
+}

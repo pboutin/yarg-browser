@@ -21,7 +21,9 @@ function findChartFile(songDir: string): string {
     }
   }
   throw new Error(
-    `No chart file found in "${songDir}". Expected one of: ${CHART_FILE_TYPES.join(", ")}`,
+    `No chart file found in "${songDir}". Expected one of: ${CHART_FILE_TYPES.join(
+      ", ",
+    )}`,
   );
 }
 

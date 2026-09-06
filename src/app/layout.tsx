@@ -6,6 +6,7 @@ import "./globals.css";
 import LiveScoresToggle from "@/components/live-scores-toggle/index";
 import * as PlayersRepository from "@/repositories/players";
 import ActivePlayerSelector from "@/components/active-player-selector/index";
+import ScanSongsButton from "@/components/scan-songs-button";
 
 const interFont = Inter({
   variable: "--font-inter",
@@ -44,6 +45,8 @@ export default async function RootLayout({
               activePlayerId={activePlayerId}
             />
             <LiveScoresToggle />
+
+            <ScanSongsButton />
           </div>
         </nav>
         <main className="bg-background flex-1 min-h-0 overflow-hidden">
