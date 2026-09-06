@@ -8,6 +8,7 @@ import Instruments from "@/components/instruments";
 import { getSongAlbumImageUrl } from "@/utilities/songs";
 import FixStarsButton from "@/components/fix-stars-button";
 import DeleteSongButton from "@/components/delete-song-button";
+import { Sparkles } from "lucide-react";
 
 interface Props {
   song: Song;
@@ -31,6 +32,12 @@ const SongSidePanel = ({ song, scores, onDeleted }: Props) => {
               className="w-full"
               onError={() => setHasImageError(true)}
             />
+          ) : null}
+
+          {song.albumImageOptimized ? (
+            <div className="p-2 bg-primary rounded-full absolute top-3 right-3">
+              <Sparkles className="w-5 h-5" />
+            </div>
           ) : null}
 
           <div className="flex flex-col gap-1 px-4 pt-12 absolute bottom-0 left-0 right-0 bg-linear-to-b from-background/0 via-background/55 via-35% to-background">

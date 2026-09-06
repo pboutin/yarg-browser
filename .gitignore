@@ -48,5 +48,8 @@ next-env.d.ts
 # Songs directory
 /songs
 
+# Album art download cache
+/src/lib/songs-scan/.cache
+
 # scores.db (dev debug)
 scores.db

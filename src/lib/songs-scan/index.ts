@@ -6,6 +6,7 @@ import * as SongsRepository from "@/repositories/songs";
 import readIniFile from "@/lib/songs-scan/read-ini-file";
 import { computeSongChecksum } from "@/lib/songs-scan/checksum";
 import { listChartedInstruments } from "@/lib/songs-scan/instruments";
+import fetchOptimalAlbumImage from "@/lib/songs-scan/fetch-optimal-album-image";
 import { resolveEnv } from "@/utilities/environment";
 
 export default async function scanAllSongs() {
@@ -32,6 +33,21 @@ export default async function scanAllSongs() {
     const checksum = computeSongChecksum(currentSongDirectory);
     const instruments = listChartedInstruments(currentSongDirectory);
 
+    const existingSong = await SongsRepository.getByChecksum(checksum);
+    let albumImageOptimized = existingSong?.albumImageOptimized ?? null;
+
+    if (
+      albumImageOptimized === null &&
+      songIniContent.album &&
+      songIniContent.artist
+    ) {
+      albumImageOptimized = await fetchOptimalAlbumImage(
+        songIniContent.artist,
+        songIniContent.album,
+        currentSongDirectory,
+      );
+    }
+
     const song: Omit<Song, "id"> = {
       name: songIniContent.name,
       directory: songDirectory,
@@ -44,6 +60,7 @@ export default async function scanAllSongs() {
       length: parseInt(songIniContent.song_length),
       checksum,
       instruments,
+      albumImageOptimized,
     };
 
     await SongsRepository.upsert(song);
