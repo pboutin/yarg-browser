@@ -31,7 +31,7 @@ const SongSidePanel = ({ song, scores }: Props) => {
             />
           ) : null}
 
-          <div className="flex flex-col gap-1 px-4 pt-12 absolute bottom-0 left-0 right-0 bg-linear-to-b from-background/0 via-background/60 via-40% to-background">
+          <div className="flex flex-col gap-1 px-4 pt-12 absolute bottom-0 left-0 right-0 bg-linear-to-b from-background/0 via-background/55 via-35% to-background">
             <div className="text-white text-3xl font-bold">{song.name}</div>
             <div className="text-primary text-xl font-semibold">
               {song.artist}
