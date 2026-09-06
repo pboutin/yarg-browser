@@ -65,7 +65,7 @@ const SongScreen = ({
           onClick={handleDifficultyClick}
         />
 
-        <SongSidePanel song={song} />
+        <SongSidePanel song={song} scores={scores} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-// Read-only schema for YARG's scores.db (owned by another app).
+// Schema for YARG's scores.db (owned by another app).
 // Do not run migrate / db push against this database.
 
 generator client {

@@ -258,3 +258,16 @@ export const latestPlayedAtForSongs = async (
       : null;
   });
 };
+
+export const fixInvalidGoldStars = async (
+  scoreIds: string[],
+): Promise<void> => {
+  await prismaScoresClient.playerScore.updateMany({
+    where: {
+      id: { in: scoreIds.map(Number) },
+    },
+    data: {
+      stars: 5,
+    },
+  });
+};

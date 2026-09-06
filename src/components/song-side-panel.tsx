@@ -3,15 +3,17 @@
 import CharterIcon from "@/components/charter-icon";
 import formatDuration from "@/utilities/format-duration";
 import { useState } from "react";
-import { Song } from "@/types";
+import { CompleteScore, Song } from "@/types";
 import Instruments from "@/components/instruments";
 import { getSongAlbumImageUrl } from "@/utilities/songs";
+import FixStarsButton from "@/components/fix-stars-button";
 
 interface Props {
   song: Song;
+  scores?: CompleteScore[];
 }
 
-const SongSidePanel = ({ song }: Props) => {
+const SongSidePanel = ({ song, scores }: Props) => {
   const [hasImageError, setHasImageError] = useState<boolean>(false);
 
   return (
@@ -66,6 +68,7 @@ const SongSidePanel = ({ song }: Props) => {
             </div>
             <Instruments instruments={song.instruments} />
           </div>
+          <div>{scores ? <FixStarsButton scores={scores} /> : null}</div>
         </div>
       </div>
     </div>
