@@ -104,12 +104,19 @@ export default async function fetchOptimalAlbumImage(
   }
 
   const albumPath = path.join(songDirectory, "album.jpg");
-  const backupPath = path.join(songDirectory, "album-backup.jpg");
+  const originalCandidates = ["album.png", "album.jpeg", "album.jpg"] as const;
 
-  try {
-    await fs.rename(albumPath, backupPath);
-  } catch {
-    // Original album.jpg may not exist
+  for (const filename of originalCandidates) {
+    const originalPath = path.join(songDirectory, filename);
+    const ext = path.extname(filename);
+    const backupPath = path.join(songDirectory, `album-backup${ext}`);
+
+    try {
+      await fs.rename(originalPath, backupPath);
+      break;
+    } catch {
+      // Original may not exist under this extension
+    }
   }
 
   await fs.writeFile(albumPath, resized);
