@@ -36,8 +36,12 @@ export default async function scanAllSongs() {
     const existingSong = await SongsRepository.getByChecksum(checksum);
     let albumImageOptimized = existingSong?.albumImageOptimized ?? null;
 
+    const shouldReprocessAlbumImage =
+      songIniContent.album !== existingSong?.album ||
+      songIniContent.artist !== existingSong?.artist;
+
     if (
-      albumImageOptimized === null &&
+      (albumImageOptimized === null || shouldReprocessAlbumImage) &&
       songIniContent.album &&
       songIniContent.artist
     ) {
