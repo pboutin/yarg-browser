@@ -6,7 +6,6 @@ import { useState } from "react";
 import { CompleteScore, Song } from "@/types";
 import Instruments from "@/components/instruments";
 import { getSongAlbumImageUrl } from "@/utilities/songs";
-import FixStarsButton from "@/components/fix-stars-button";
 import DeleteSongButton from "@/components/delete-song-button";
 import { Sparkles } from "lucide-react";
 
@@ -78,7 +77,6 @@ const SongSidePanel = ({ song, scores, onDeleted }: Props) => {
             <Instruments instruments={song.instruments} />
           </div>
           <div className="mt-4 flex items-center gap-2">
-            {scores ? <FixStarsButton scores={scores} /> : null}
             {onDeleted ? (
               <DeleteSongButton song={song} onDeleted={onDeleted} />
             ) : null}

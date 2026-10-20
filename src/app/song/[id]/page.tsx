@@ -75,6 +75,23 @@ const SongPage = async ({ params, searchParams }: Props) => {
     activeDifficulty,
   );
 
+  // Invalid gold star fixer
+  const bestFiveStars = scores.reduce((acc, { stars, score }) => {
+    if (stars === 6) return acc;
+    return Math.max(acc, score);
+  }, 0);
+
+  const invalidGoldStarIds = scores
+    .filter(({ stars, score }) => stars === 6 && score <= bestFiveStars)
+    .map(({ id }) => id);
+
+  if (invalidGoldStarIds.length > 0) {
+    await ScoresRepository.fixInvalidGoldStars(invalidGoldStarIds);
+    console.warn(
+      `Fixed ${invalidGoldStarIds.length} invalid gold stars scores.`,
+    );
+  }
+
   return (
     <SongScreen
       song={song}
