@@ -3,7 +3,7 @@
 import fs from "fs";
 import { Song } from "@/types";
 import * as SongsRepository from "@/repositories/songs";
-import readIniFile from "@/lib/songs-scan/read-ini-file";
+import { readIniFile, writeIniFile } from "@/lib/songs-scan/ini-file";
 import { computeSongChecksum } from "@/lib/songs-scan/checksum";
 import { listChartedInstruments } from "@/lib/songs-scan/instruments";
 import fetchOptimalAlbumImage from "@/lib/songs-scan/fetch-optimal-album-image";
@@ -30,6 +30,16 @@ export default async function scanAllSongs() {
     }
 
     const songIniContent = readIniFile(songIniPath);
+
+    if (
+      typeof songIniContent.artist === "string" &&
+      (songIniContent.artist as string).endsWith(" (WaveGroup)")
+    ) {
+      writeIniFile(songIniPath, {
+        artist: songIniContent.artist.replace(" (WaveGroup)", ""),
+      });
+    }
+
     const checksum = computeSongChecksum(currentSongDirectory);
     const instruments = listChartedInstruments(currentSongDirectory);
 
