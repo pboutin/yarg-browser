@@ -20,8 +20,15 @@ const ScoresHistory = ({ scores, bestScore }: Props) => {
             isFc: score.isFc,
             isPb: score.id === bestScore.id,
           })
+            .with(
+              { isFc: true, isPb: true },
+              () => "aura aura-gold sticky top-0 bottom-0 z-10",
+            )
             .with({ isFc: true }, () => "aura aura-gold")
-            .with({ isPb: true }, () => "aura aura-silver")
+            .with(
+              { isPb: true },
+              () => "aura aura-silver sticky top-0 bottom-0 z-10",
+            )
             .otherwise(() => "")}
         >
           <div className="card w-full bg-tertiary card-sm">
