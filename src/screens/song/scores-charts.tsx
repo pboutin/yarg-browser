@@ -118,7 +118,10 @@ const buildChartConfig = ({
       x: {
         type: "time",
         ...COMMON_OPTIONS.scales.x,
-        display: showXAxis,
+        ticks: {
+          ...COMMON_OPTIONS.scales.x.ticks,
+          display: showXAxis,
+        },
         time: {
           displayFormats: {
             day: "MMM d, yyyy",
