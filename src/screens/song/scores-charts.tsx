@@ -122,6 +122,23 @@ const buildChartConfig = ({
       },
       y: {
         ...COMMON_OPTIONS.scales.y,
+        position: "left",
+        ticks: {
+          ...COMMON_OPTIONS.scales.y.ticks,
+          callback: (value) => formatValue(Number(value)),
+        },
+      },
+      yRight: {
+        type: "linear",
+        position: "right",
+        grid: {
+          drawOnChartArea: false,
+          drawTicks: true,
+        },
+        afterDataLimits: (axis) => {
+          axis.min = axis.chart.scales.y.min;
+          axis.max = axis.chart.scales.y.max;
+        },
         ticks: {
           ...COMMON_OPTIONS.scales.y.ticks,
           callback: (value) => formatValue(Number(value)),
