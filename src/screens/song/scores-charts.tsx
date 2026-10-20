@@ -64,7 +64,7 @@ const COMMON_OPTIONS = {
   scales: {
     x: {
       ticks: { ...AXIS_TICKS, maxRotation: 45 },
-      grid: AXIS_GRID,
+      grid: { ...AXIS_GRID, drawOnChartArea: false },
     },
     y: {
       ticks: AXIS_TICKS,
