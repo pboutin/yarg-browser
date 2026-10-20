@@ -68,7 +68,7 @@ const SongPage = async ({ params, searchParams }: Props) => {
   const activeDifficulty =
     difficultyParam ?? playedDifficulties[playedDifficulties.length - 1];
 
-  const scores = await ScoresRepository.findAll(
+  let scores = await ScoresRepository.findAll(
     activePlayerId,
     song.checksum,
     activeInstrument,
@@ -89,6 +89,13 @@ const SongPage = async ({ params, searchParams }: Props) => {
     await ScoresRepository.fixInvalidGoldStars(invalidGoldStarIds);
     console.warn(
       `Fixed ${invalidGoldStarIds.length} invalid gold stars scores.`,
+    );
+
+    scores = await ScoresRepository.findAll(
+      activePlayerId,
+      song.checksum,
+      activeInstrument,
+      activeDifficulty,
     );
   }
 
