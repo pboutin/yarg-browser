@@ -6,7 +6,6 @@ import { useMemo } from "react";
 import ScoresHistory from "@/screens/song/scores-history";
 import ScoresCharts from "@/screens/song/scores-charts";
 import Instruments from "@/components/instruments";
-import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import Difficulties from "@/components/difficulties";
 

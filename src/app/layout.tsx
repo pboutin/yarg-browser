@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import "./globals.css";
-import LiveScoresToggle from "@/components/live-scores-toggle/index";
 import * as PlayersRepository from "@/repositories/players";
-import ActivePlayerSelector from "@/components/active-player-selector/index";
-import ScanSongsButton from "@/components/scan-songs-button";
+import MainNav from "@/components/main-nav";
 
 const interFont = Inter({
   variable: "--font-inter",
@@ -30,25 +27,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${interFont.variable} antialiased h-screen overflow-hidden flex flex-col`}
+        className={`${interFont.variable} antialiased flex flex-col h-screen overflow-hidden`}
       >
-        <nav className="navbar bg-background border-b-8 border-layout-light">
-          <Link href="/" className="btn btn-ghost text-xl">
-            YARG Browser
-          </Link>
-          <Link href="/" className="btn btn-ghost">
-            Library
-          </Link>
-          <div className="ml-auto flex items-center gap-4">
-            <ActivePlayerSelector
-              players={players}
-              activePlayerId={activePlayerId}
-            />
-            <LiveScoresToggle />
+        <MainNav players={players} activePlayerId={activePlayerId} />
 
-            <ScanSongsButton />
-          </div>
-        </nav>
         <main className="bg-background flex-1 min-h-0 overflow-hidden">
           {children}
         </main>
