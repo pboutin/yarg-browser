@@ -2,7 +2,7 @@
 
 import SongSidePanel from "@/components/song-side-panel";
 import { CompleteScore, Difficulty, Instrument, Song } from "@/types";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import ScoresHistory from "@/screens/song/scores-history";
 import ScoresCharts from "@/screens/song/scores-charts";
 import Instruments from "@/components/instruments";
@@ -27,6 +27,7 @@ const SongScreen = ({
   activeDifficulty,
 }: Props) => {
   const router = useRouter();
+  const [hoveredScoreId, setHoveredScoreId] = useState<string | null>(null);
 
   const bestScore = useMemo(() => {
     return scores.reduce((best, score) => {
@@ -46,8 +47,17 @@ const SongScreen = ({
 
   return (
     <div className="flex h-full">
-      <ScoresHistory scores={scores} bestScore={bestScore} />
-      <ScoresCharts scores={scores} />
+      <ScoresHistory
+        scores={scores}
+        bestScore={bestScore}
+        hoveredScoreId={hoveredScoreId}
+        onScoreHover={setHoveredScoreId}
+      />
+      <ScoresCharts
+        scores={scores}
+        hoveredScoreId={hoveredScoreId}
+        onScoreHover={setHoveredScoreId}
+      />
       <div className="flex flex-col gap-4">
         <div className="text-gray-400 font-semibold text-sm mt-2 -mb-2">
           PLAYED ON

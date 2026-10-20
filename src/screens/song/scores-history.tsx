@@ -4,19 +4,28 @@ import formatPercent from "@/utilities/format-percent";
 import formatScore from "@/utilities/format-score";
 import { match } from "ts-pattern";
 import { format, formatDistanceToNow } from "date-fns";
-import { HashIcon } from "lucide-react";
+import classNames from "classnames";
 
 interface Props {
   scores: CompleteScore[];
   bestScore: CompleteScore;
+  hoveredScoreId: string | null;
+  onScoreHover: (scoreId: string | null) => void;
 }
 
-const ScoresHistory = ({ scores, bestScore }: Props) => {
+const ScoresHistory = ({
+  scores,
+  bestScore,
+  hoveredScoreId,
+  onScoreHover,
+}: Props) => {
   return (
     <div className="flex-1 max-w-(--sidebar-width) min-h-0 overflow-y-auto overflow-x-visible flex flex-col gap-2 p-2 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
       {scores.map((score) => (
         <div
           key={score.id}
+          onMouseEnter={() => onScoreHover(score.id)}
+          onMouseLeave={() => onScoreHover(null)}
           className={match({
             isFc: score.isFc,
             isPb: score.id === bestScore.id,
@@ -32,7 +41,11 @@ const ScoresHistory = ({ scores, bestScore }: Props) => {
             )
             .otherwise(() => "")}
         >
-          <div className="card w-full bg-tertiary card-sm">
+          <div
+            className={classNames("card w-full bg-tertiary card-sm", {
+              "ring-4 ring-primary ring-inset": hoveredScoreId === score.id,
+            })}
+          >
             <div className="card-body">
               <h2 className="card-title">
                 <div className="flex w-full justify-between items-center">
@@ -51,7 +64,7 @@ const ScoresHistory = ({ scores, bestScore }: Props) => {
               <h2 className="card-title">
                 <div className="flex w-full items-center">
                   {formatPercent(score.percent)}
-                  <div className="divider divider-horizontal" />
+                  <div className="divider divider-horizontal mx-1" />
                   {score.notesHit} / {score.notesHit + score.notesMissed}
                   {score.notesMissed ? (
                     <span className="text-sm text-error font-bold ml-2 bottom-1 relative">

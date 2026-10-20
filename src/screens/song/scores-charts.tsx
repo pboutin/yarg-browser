@@ -17,7 +17,7 @@ import {
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import { format } from "date-fns";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 Chart.register(
   LineController,
@@ -39,6 +39,10 @@ const DATASET_STYLE = {
   backgroundColor: LINE_FILL,
   pointBackgroundColor: LINE_COLOR,
   pointBorderColor: LINE_COLOR,
+  pointHoverRadius: 7,
+  pointHoverBorderWidth: 2,
+  pointHoverBorderColor: "#ffffff",
+  pointHitRadius: 8,
   tension: 0,
   fill: true,
 } as const;
@@ -74,6 +78,7 @@ interface ChartSpec {
   dataPoints: { x: number; y: number }[];
   formatValue: (value: number) => string;
   showXAxis: boolean;
+  onHover: (index: number | null) => void;
 }
 
 const buildChartConfig = ({
@@ -81,6 +86,7 @@ const buildChartConfig = ({
   dataPoints,
   formatValue,
   showXAxis,
+  onHover,
 }: ChartSpec): ChartConfiguration<"line"> => ({
   type: "line",
   data: {
@@ -94,6 +100,8 @@ const buildChartConfig = ({
   },
   options: {
     ...COMMON_OPTIONS,
+    interaction: { mode: "nearest", intersect: true },
+    onHover: (_event, elements) => onHover(elements[0]?.index ?? null),
     plugins: {
       ...COMMON_OPTIONS.plugins,
       tooltip: {
@@ -150,19 +158,25 @@ const buildChartConfig = ({
 
 interface Props {
   scores: CompleteScore[];
+  hoveredScoreId: string | null;
+  onScoreHover: (scoreId: string | null) => void;
 }
 
-const ScoresCharts = ({ scores }: Props) => {
+const ScoresCharts = ({ scores, hoveredScoreId, onScoreHover }: Props) => {
   const scoreCanvasRef = useRef<HTMLCanvasElement>(null);
   const percentCanvasRef = useRef<HTMLCanvasElement>(null);
+  const chartsRef = useRef<Chart<"line">[]>([]);
+  const chronological = useMemo(
+    () => [...scores].sort((a, b) => a.date.getTime() - b.date.getTime()),
+    [scores],
+  );
 
   useEffect(() => {
     const canvases = [scoreCanvasRef.current, percentCanvasRef.current];
     if (canvases.some((canvas) => !canvas)) return;
 
-    const chronological = [...scores].sort(
-      (a, b) => a.date.getTime() - b.date.getTime(),
-    );
+    const onHover = (index: number | null) =>
+      onScoreHover(index === null ? null : chronological[index].id);
 
     const toDataPoints = (field: "score" | "percent") =>
       chronological.map((score) => ({
@@ -176,25 +190,49 @@ const ScoresCharts = ({ scores }: Props) => {
         dataPoints: toDataPoints("score"),
         formatValue: formatScore,
         showXAxis: false,
+        onHover,
       }),
       buildChartConfig({
         label: "Percent",
         dataPoints: toDataPoints("percent"),
         formatValue: formatPercent,
         showXAxis: true,
+        onHover,
       }),
     ].map(
       (config, index) =>
         new Chart(canvases[index] as HTMLCanvasElement, config),
     );
+    chartsRef.current = charts;
 
     return () => {
       charts.forEach((chart) => chart.destroy());
+      chartsRef.current = [];
     };
-  }, [scores]);
+  }, [chronological, onScoreHover]);
+
+  useEffect(() => {
+    const index = chronological.findIndex(
+      (score) => score.id === hoveredScoreId,
+    );
+    const activeElements = index < 0 ? [] : [{ datasetIndex: 0, index }];
+
+    chartsRef.current.forEach((chart) => {
+      chart.setActiveElements(activeElements);
+      const point = index < 0 ? null : chart.getDatasetMeta(0).data[index];
+      chart.tooltip?.setActiveElements(
+        activeElements,
+        point ? { x: point.x, y: point.y } : { x: 0, y: 0 },
+      );
+      chart.update("none");
+    });
+  }, [chronological, hoveredScoreId, onScoreHover]);
 
   return (
-    <div className="flex-1 min-w-0 min-h-0 flex flex-col gap-4 p-4">
+    <div
+      className="flex-1 min-w-0 min-h-0 flex flex-col gap-4 p-4"
+      onMouseLeave={() => onScoreHover(null)}
+    >
       <div className="relative flex-1 min-h-0 min-w-0">
         <canvas ref={scoreCanvasRef} />
       </div>
