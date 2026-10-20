@@ -24,7 +24,7 @@ const MainNav = ({ players, activePlayerId }: Props) => {
       />
       <nav
         className={classNames(
-          "z-100 fixed navbar bg-background border-b-8 border-layout-light transition-transform",
+          "z-100 fixed top-[-1px] navbar bg-background border-b-8 border-layout-light transition-transform",
           isVisible ? "translate-y-0" : "-translate-y-full",
         )}
         onMouseLeave={() => setIsVisible(false)}
