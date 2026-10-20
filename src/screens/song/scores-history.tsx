@@ -4,6 +4,7 @@ import formatPercent from "@/utilities/format-percent";
 import formatScore from "@/utilities/format-score";
 import { match } from "ts-pattern";
 import { format, formatDistanceToNow } from "date-fns";
+import { HashIcon } from "lucide-react";
 
 interface Props {
   scores: CompleteScore[];
@@ -35,14 +36,20 @@ const ScoresHistory = ({ scores, bestScore }: Props) => {
             <div className="card-body">
               <h2 className="card-title">
                 <div className="flex w-full justify-between items-center">
-                  <span className="text-2xl font-bold">
-                    {formatScore(score.score)}
-                  </span>
+                  <div className="flex">
+                    <span className="text-2xl font-bold">
+                      {formatScore(score.score)}
+                    </span>
+
+                    <span className="text-md font-bold text-primary ml-2 bottom-1 relative">
+                      {score.rank}/{scores.length}
+                    </span>
+                  </div>
                   <ScoreStars stars={score.stars} size={32} />
                 </div>
               </h2>
               <h2 className="card-title">
-                <div className="flex w-full  items-center">
+                <div className="flex w-full items-center">
                   {formatPercent(score.percent)}
                   <div className="divider divider-horizontal" />
                   {score.notesHit} / {score.notesHit + score.notesMissed}

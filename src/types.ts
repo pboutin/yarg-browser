@@ -62,4 +62,5 @@ export interface CompleteScore {
   notesHit: number;
   notesMissed: number;
   isFc: boolean;
+  rank: number;
 }

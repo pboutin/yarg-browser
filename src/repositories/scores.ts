@@ -84,6 +84,10 @@ export const findAll = async (
     },
   });
 
+  const rankedScoreIds = [...scores]
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+    .map((score) => score.id.toString());
+
   return scores.flatMap((score) => {
     const { gameRecord } = score;
     if (
@@ -99,9 +103,11 @@ export const findAll = async (
       return [];
     }
 
+    const scoreId = score.id.toString();
+
     return [
       {
-        id: score.id.toString(),
+        id: scoreId,
         date: ticksToDate(gameRecord.date),
         gameVersion: gameRecord.gameVersion,
         score: score.score,
@@ -110,6 +116,7 @@ export const findAll = async (
         notesHit: score.notesHit,
         notesMissed: score.notesMissed,
         isFc: score.isFc !== 0,
+        rank: rankedScoreIds.indexOf(scoreId) + 1,
       },
     ];
   });
