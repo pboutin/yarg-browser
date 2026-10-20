@@ -35,8 +35,9 @@ export default async function scanAllSongs() {
       typeof songIniContent.artist === "string" &&
       (songIniContent.artist as string).endsWith(" (WaveGroup)")
     ) {
+      songIniContent.artist = songIniContent.artist.replace(" (WaveGroup)", "");
       writeIniFile(songIniPath, {
-        artist: songIniContent.artist.replace(" (WaveGroup)", ""),
+        artist: songIniContent.artist,
       });
     }
 
