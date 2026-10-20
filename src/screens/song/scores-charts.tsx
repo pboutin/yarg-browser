@@ -73,12 +73,14 @@ interface ChartSpec {
   label: string;
   dataPoints: { x: number; y: number }[];
   formatValue: (value: number) => string;
+  showXAxis: boolean;
 }
 
 const buildChartConfig = ({
   label,
   dataPoints,
   formatValue,
+  showXAxis,
 }: ChartSpec): ChartConfiguration<"line"> => ({
   type: "line",
   data: {
@@ -108,6 +110,7 @@ const buildChartConfig = ({
       x: {
         type: "time",
         ...COMMON_OPTIONS.scales.x,
+        display: showXAxis,
         time: {
           displayFormats: {
             day: "MMM d, yyyy",
@@ -155,11 +158,13 @@ const ScoresCharts = ({ scores }: Props) => {
         label: "Score",
         dataPoints: toDataPoints("score"),
         formatValue: formatScore,
+        showXAxis: false,
       }),
       buildChartConfig({
         label: "Percent",
         dataPoints: toDataPoints("percent"),
         formatValue: formatPercent,
+        showXAxis: true,
       }),
     ].map(
       (config, index) =>
@@ -172,7 +177,7 @@ const ScoresCharts = ({ scores }: Props) => {
   }, [scores]);
 
   return (
-    <div className="flex-1 min-w-0 min-h-0 flex flex-col gap-8 p-4">
+    <div className="flex-1 min-w-0 min-h-0 flex flex-col gap-4 p-4">
       <div className="relative flex-1 min-h-0 min-w-0">
         <canvas ref={scoreCanvasRef} />
       </div>
