@@ -72,7 +72,7 @@ export default async function scanAllSongs() {
       year: songIniContent.year,
       charter: songIniContent.charter,
       charterId: songIniContent.icon,
-      length: parseInt(songIniContent.song_length),
+      length: parseInt(songIniContent.song_length, 10),
       checksum,
       instruments,
       albumImageOptimized,
