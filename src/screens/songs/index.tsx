@@ -122,21 +122,21 @@ const SongsScreen = () => {
       <div className="flex h-full">
         <div className="flex flex-1 flex-col min-h-0 min-w-0">
           <div className="py-4 px-4 w-full gap-6 bg-black border-b-8 border-layout-light items-center">
-            <div className="flex gap-8 items-center">
-              <div className="flex gap-8 flex-1 items-center">
-                <div className="text-white uppercase font-extrabold text-4xl">
+            <div className="flex gap-4 sm:gap-8 items-center">
+              <div className="flex gap-4 sm:gap-8 flex-1 min-w-0 items-center">
+                <div className="text-white uppercase font-extrabold text-2xl sm:text-4xl shrink-0">
                   library
                 </div>
 
                 <input
                   type="text"
                   value={query}
-                  className="input input-md w-full"
+                  className="input input-md w-full min-w-0"
                   onChange={handleSearchChange}
                 />
               </div>
 
-              <div className="">
+              <div className="shrink-0">
                 {total ? <SongCount count={total} /> : null}
               </div>
             </div>
@@ -178,10 +178,10 @@ const SongsScreen = () => {
                     >
                       <CharterIcon charterId={song.charterId} size={32} />
 
-                      <div className="flex-1 flex items-center">
+                      <div className="flex-1 min-w-0 flex items-center">
                         <span
                           className={classNames(
-                            "text-xl",
+                            "text-xl truncate",
                             song.id === selectedSong?.id
                               ? "text-white font-bold"
                               : "text-primary",
@@ -192,7 +192,7 @@ const SongsScreen = () => {
                         {song.album ? (
                           <span
                             className={classNames(
-                              "text-md ml-2",
+                              "text-base ml-2 hidden sm:block truncate",
                               song.id === selectedSong?.id
                                 ? "text-white font-bold"
                                 : "text-secondary",
@@ -205,7 +205,7 @@ const SongsScreen = () => {
 
                       <div
                         className={classNames(
-                          "text-sm italic flex-1 font-semibold",
+                          "text-sm italic flex-1 min-w-0 truncate font-semibold hidden xl:block",
                           song.id === selectedSong?.id
                             ? "text-white font-bold"
                             : "text-secondary",
@@ -218,12 +218,14 @@ const SongsScreen = () => {
                           : null}
                       </div>
 
-                      <Instruments
-                        instruments={song.instruments}
-                        instrumentPersonalBests={song.personalBests}
-                        size={42}
-                        className="flex-1 justify-end "
-                      />
+                      <div className="max-w-2/5 min-w-0 overflow-x-auto">
+                        <Instruments
+                          instruments={song.instruments}
+                          instrumentPersonalBests={song.personalBests}
+                          size={42}
+                          className="w-max justify-end"
+                        />
+                      </div>
                     </div>
                   </div>
                 );

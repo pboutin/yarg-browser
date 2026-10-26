@@ -28,7 +28,9 @@ const ArtistHeader = ({
     <div
       className={`flex items-center gap-2 pl-16 py-2 pr-4 bg-gradient-to-b from-layout-dark to-transparent ${className}`}
     >
-      <div className="text-white/80 text-xl font-bold">{artist}</div>
+      <div className="text-white/80 text-xl font-bold min-w-0 truncate">
+        {artist}
+      </div>
       {songCount ? <SongCount count={songCount} /> : null}
     </div>
   );

@@ -178,6 +178,8 @@ const ScoresCharts = ({ scores, hoveredScoreId, onScoreHover }: Props) => {
     const canvases = [scoreCanvasRef.current, percentCanvasRef.current];
     if (canvases.some((canvas) => !canvas)) return;
 
+    Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+
     const onHover = (index: number | null) =>
       onScoreHover(index === null ? null : chronological[index].id);
 
@@ -207,6 +209,11 @@ const ScoresCharts = ({ scores, hoveredScoreId, onScoreHover }: Props) => {
         new Chart(canvases[index] as HTMLCanvasElement, config),
     );
     chartsRef.current = charts;
+
+    void document.fonts.ready.then(() => {
+      if (chartsRef.current !== charts) return;
+      charts.forEach((chart) => chart.update("none"));
+    });
 
     return () => {
       charts.forEach((chart) => chart.destroy());

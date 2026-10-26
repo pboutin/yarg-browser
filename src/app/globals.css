@@ -48,6 +48,10 @@
   --sidebar-width: 500px;
 }
 
+@theme inline {
+  --font-sans: var(--font-barlow), sans-serif;
+}
+
 *,
 *:before,
 *:after {
