@@ -13,6 +13,41 @@ const ticksToDate = (ticks: bigint): Date => {
   return new Date(cursedUtcTimestamp);
 };
 
+export const historyForPlayer = async (playerId: string) => {
+  const scores = await prismaScoresClient.playerScore.findMany({
+    where: { playerId },
+    select: {
+      id: true,
+      stars: true,
+      isFc: true,
+      instrument: true,
+      difficulty: true,
+      gameRecord: {
+        select: {
+          date: true,
+          songChecksum: true,
+          songName: true,
+          songArtist: true,
+        },
+      },
+    },
+    orderBy: [{ gameRecord: { date: "desc" } }, { id: "desc" }],
+  });
+
+  return scores.flatMap(({ gameRecord, ...score }) => {
+    if (gameRecord?.date == null || !gameRecord.songChecksum) return [];
+
+    return [{
+      ...score,
+      isFc: score.isFc != null && score.isFc !== 0,
+      date: ticksToDate(gameRecord.date),
+      checksum: Buffer.from(gameRecord.songChecksum).toString("hex").toUpperCase(),
+      name: gameRecord.songName ?? "Unknown song",
+      artist: gameRecord.songArtist ?? "Unknown artist",
+    }];
+  });
+};
+
 export const findLatestForPlayer = async (
   playerId: string,
   songChecksum?: string,

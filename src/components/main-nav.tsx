@@ -35,6 +35,9 @@ const MainNav = ({ players, activePlayerId }: Props) => {
         <Link href="/" className="btn btn-ghost">
           Library
         </Link>
+        <Link href="/stats" className="btn btn-ghost">
+          Stats
+        </Link>
         <div className="ml-auto flex items-center gap-4">
           <ActivePlayerSelector
             players={players}
