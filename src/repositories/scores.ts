@@ -1,16 +1,22 @@
 import prismaScoresClient from "@/repositories/_prisma-scores-client";
 import { CompleteScore, Difficulty, Instrument, ScoreMetadata } from "@/types";
 
-const UTC_OFFSET_MS = new Date().getTimezoneOffset() * 60000;
 const EPOCH_TICKS = BigInt("621355968000000000");
 
 /** .NET DateTime ticks (100ns since 0001-01-01) → JS Date */
 const ticksToDate = (ticks: bigint): Date => {
-  // YARG timestamp is in local time
-  // since Date expect a unix timestamp, we need offset it back to UTC
-  const cursedUtcTimestamp =
-    Number((ticks - EPOCH_TICKS) / BigInt(10000)) + UTC_OFFSET_MS;
-  return new Date(cursedUtcTimestamp);
+  // YARG stores local wall-clock ticks (DateTime.Now) with no offset;
+  // rebuild from fields so the DST-correct offset for that date is applied.
+  const wallClock = new Date(Number((ticks - EPOCH_TICKS) / BigInt(10000)));
+  return new Date(
+    wallClock.getUTCFullYear(),
+    wallClock.getUTCMonth(),
+    wallClock.getUTCDate(),
+    wallClock.getUTCHours(),
+    wallClock.getUTCMinutes(),
+    wallClock.getUTCSeconds(),
+    wallClock.getUTCMilliseconds(),
+  );
 };
 
 export const findLatestForPlayer = async (
